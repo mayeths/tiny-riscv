@@ -1,0 +1,6 @@
+*.Xil
+*.cache
+*.hw
+*.sim
+*.xpr
+vivado*
