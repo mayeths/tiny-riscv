@@ -103,6 +103,11 @@ assign base_ram_data = base_ram_data_reg;
 
 always@(posedge clk_10M or posedge reset_of_clk10M) begin
     if(reset_of_clk10M) begin
+        base_ram_ce_n <= 1'b1;
+        base_ram_oe_n <= 1'b1;
+        base_ram_we_n <= 1'b1;
+        uart_rdn <= 1'b1;
+        uart_wrn <= 1'b1;
         state <= `STATE_RESET;
     end else begin
         case (state)
