@@ -109,7 +109,7 @@ always@(posedge clk_10M or posedge reset_of_clk10M) begin
             `STATE_RESET: begin
                 byte_count <= 4'b0;
                 base_address <= dip_sw[19: 0];
-                address <= base_address;
+                address <= dip_sw[19: 0];
 
                 base_ram_ce_n <= 1'b1;
                 base_ram_oe_n <= 1'b1;
