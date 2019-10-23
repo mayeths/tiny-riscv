@@ -14,19 +14,19 @@ module thinpad_top(
     output wire[7:0]  dpy1,       //数码管高位信号，包括小数点，输出1点亮
 
     //CPLD串口控制器信号
-    output wire uart_rdn,         //读串口信号，低有效
-    output wire uart_wrn,         //写串口信号，低有效
+    output reg uart_rdn,         //读串口信号，低有效
+    output reg uart_wrn,         //写串口信号，低有效
     input wire uart_dataready,    //串口数据准备好
     input wire uart_tbre,         //发送数据标志
     input wire uart_tsre,         //数据发送完毕标志
 
     //BaseRAM信号
     inout wire[31:0] base_ram_data,  //BaseRAM数据，低8位与CPLD串口控制器共享
-    output wire[19:0] base_ram_addr, //BaseRAM地址
+    output reg[19:0] base_ram_addr, //BaseRAM地址
     output wire[3:0] base_ram_be_n,  //BaseRAM字节使能，低有效。如果不使用字节使能，请保持为0
-    output wire base_ram_ce_n,       //BaseRAM片选，低有效
-    output wire base_ram_oe_n,       //BaseRAM读使能，低有效
-    output wire base_ram_we_n,       //BaseRAM写使能，低有效
+    output reg base_ram_ce_n,       //BaseRAM片选，低有效
+    output reg base_ram_oe_n,       //BaseRAM读使能，低有效
+    output reg base_ram_we_n,       //BaseRAM写使能，低有效
 
     //ExtRAM信号
     inout wire[31:0] ext_ram_data,  //ExtRAM数据
@@ -80,6 +80,138 @@ module thinpad_top(
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
 
+reg [3: 0] state;
+
+`define STATE_RESET     4'b0000
+`define UART_TX_INIT    4'b0001
+`define UART_TX_DATA    4'b0010
+`define UART_TX_WAIT    4'b0011
+`define UART_RX_INIT    4'b0101
+`define UART_RX_DATA    4'b0110
+`define SRAM_READ       4'b1000
+`define SRAM_WRITE      4'b1010
+`define SRAM_W_DONE     4'b1011
+`define SRAM_R_DONE     4'b1100
+
+reg [3: 0] byte_count;
+reg [19: 0] address;
+reg [19: 0] base_address;
+reg [7: 0] data;
+
+reg [31: 0] base_ram_data_reg;
+assign base_ram_data = base_ram_data_reg;
+
+always@(posedge clk_10M or posedge reset_of_clk10M) begin
+    if(reset_of_clk10M) begin
+        state <= `STATE_RESET;
+    end else begin
+        case (state)
+            `STATE_RESET: begin
+                byte_count <= 4'b0;
+                base_address <= dip_sw[19: 0];
+                address <= base_address;
+
+                base_ram_ce_n <= 1'b1;
+                base_ram_oe_n <= 1'b1;
+                base_ram_we_n <= 1'b1;
+                uart_rdn <= 1'b1;
+                uart_wrn <= 1'b1;
+
+                state <= `UART_RX_INIT;
+            end
+
+            `UART_RX_INIT: begin
+                base_ram_data_reg <= 32'bz;
+                uart_rdn <= 1'b1;
+                if(uart_dataready) begin
+                    uart_rdn <= 1'b0;
+                    state <= `UART_RX_DATA;
+                end
+            end
+
+            `UART_RX_DATA: begin
+                data <= base_ram_data_reg[7: 0];
+                uart_rdn <= 1'b1;
+                state <= `SRAM_WRITE;
+            end
+
+            `SRAM_WRITE: begin
+                base_ram_addr <= address;
+                base_ram_ce_n <= 1'b0;
+                base_ram_we_n <= 1'b0;
+                base_ram_data_reg <= data;
+                
+                state <= `SRAM_W_DONE;
+            end
+
+            `SRAM_W_DONE: begin
+                base_ram_ce_n <= 1'b1;
+                base_ram_we_n <= 1'b1;
+
+                if(byte_count == 4'd9) begin
+                    byte_count <= 4'd0;
+                    address <= base_address;
+                    state <= `SRAM_READ;
+                end else begin
+                    byte_count <= byte_count + 4'b1;
+                    address <= address + 20'b1;
+                    state <= `UART_RX_INIT;
+                end
+            end
+
+            `SRAM_READ: begin
+                base_ram_addr <= address;
+                base_ram_ce_n <= 1'b0;
+                base_ram_oe_n <= 1'b0;
+                base_ram_data_reg <= 32'bz;
+                
+                state <= `SRAM_R_DONE;
+            end
+
+            `SRAM_R_DONE: begin
+                data <= base_ram_data_reg[7: 0];
+                base_ram_ce_n <= 1'b1;
+                base_ram_oe_n <= 1'b1;
+
+                state <= `UART_TX_INIT;
+            end
+
+            `UART_TX_INIT: begin
+                base_ram_data_reg <= {24'b0, data};
+                uart_wrn <= 1'b0;
+
+                state <= `UART_TX_DATA;
+            end
+
+            `UART_TX_DATA: begin
+                uart_wrn <= 1'b1;
+
+                if(uart_tbre)
+                    state = `UART_TX_WAIT;
+            end
+
+            `UART_TX_WAIT: begin
+                if(uart_tsre) begin
+                    if(byte_count == 4'd9) begin
+                        state <= `STATE_RESET;
+                    end else begin
+                        byte_count <= byte_count + 4'b1;
+                        address <= address + 20'b1;
+                        state <= `SRAM_READ;
+                    end
+                end
+            end
+
+            default: begin
+                state <= `STATE_RESET;
+            end
+        endcase
+     end
+end
+
+assign leds = {address[7: 0], data};
+
+
 /* =========== Demo code begin =========== */
 
 // PLL分频示例
@@ -103,112 +235,64 @@ always@(posedge clk_10M or negedge locked) begin
     else        reset_of_clk10M <= 1'b0;
 end
 
-always@(posedge clk_10M or posedge reset_of_clk10M) begin
-    if(reset_of_clk10M)begin
-        // Your Code
-    end
-    else begin
-        // Your Code
-    end
-end
-
 // 不使用内存、串口时，禁用其使能信号
-assign base_ram_ce_n = 1'b1;
-assign base_ram_oe_n = 1'b1;
-assign base_ram_we_n = 1'b1;
+// assign base_ram_ce_n = 1'b1;
+// assign base_ram_oe_n = 1'b1;
+// assign base_ram_we_n = 1'b1;
+
+assign base_ram_be_n = 4'b0;
 
 assign ext_ram_ce_n = 1'b1;
 assign ext_ram_oe_n = 1'b1;
 assign ext_ram_we_n = 1'b1;
 
-assign uart_rdn = 1'b1;
-assign uart_wrn = 1'b1;
-
-// 数码管连接关系示意图，dpy1同理
-// p=dpy0[0] // ---a---
-// c=dpy0[1] // |     |
-// d=dpy0[2] // f     b
-// e=dpy0[3] // |     |
-// b=dpy0[4] // ---g---
-// a=dpy0[5] // |     |
-// f=dpy0[6] // e     c
-// g=dpy0[7] // |     |
-//           // ---d---  p
+// assign uart_rdn = 1'b1;
+// assign uart_wrn = 1'b1;
 
 // 7段数码管译码器演示，将number用16进制显示在数码管上面
 reg[7:0] number;
 SEG7_LUT segL(.oSEG1(dpy0), .iDIG(number[3:0])); //dpy0是低位数码管
 SEG7_LUT segH(.oSEG1(dpy1), .iDIG(number[7:4])); //dpy1是高位数码管
 
-reg[15:0] led_bits;
-assign leds = led_bits;
-
-always@(posedge clock_btn or posedge reset_btn) begin
-    if(reset_btn)begin //复位按下，设置LED和数码管为初始值
-        number<=0;
-        led_bits <= 16'h1;
-    end
-    else begin //每次按下时钟按钮，数码管显示值加1，LED循环左移
-        number <= number+1;
-        led_bits <= {led_bits[14:0],led_bits[15]};
-    end
-end
-
 //直连串口接收发送演示，从直连串口收到的数据再发送出去
-wire [7:0] ext_uart_rx;
-reg  [7:0] ext_uart_buffer, ext_uart_tx;
-wire ext_uart_ready, ext_uart_busy;
-reg ext_uart_start, ext_uart_avai;
+// wire [7:0] ext_uart_rx;
+// reg  [7:0] ext_uart_buffer, ext_uart_tx;
+// wire ext_uart_ready, ext_uart_busy;
+// reg ext_uart_start, ext_uart_avai;
 
-async_receiver #(.ClkFrequency(50000000),.Baud(9600)) //接收模块，9600无检验位
-    ext_uart_r(
-        .clk(clk_50M),                       //外部时钟信号
-        .RxD(rxd),                           //外部串行信号输入
-        .RxD_data_ready(ext_uart_ready),  //数据接收到标志
-        .RxD_clear(ext_uart_ready),       //清除接收标志
-        .RxD_data(ext_uart_rx)             //接收到的一字节数据
-    );
+// async_receiver #(.ClkFrequency(10000000),.Baud(9600)) //接收模块，9600无检验位
+//     ext_uart_r(
+//         .clk(clk_10M),                       //外部时钟信号
+//         .RxD(rxd),                           //外部串行信号输入
+//         .RxD_data_ready(ext_uart_ready),  //数据接收到标志
+//         .RxD_clear(ext_uart_ready),       //清除接收标志
+//         .RxD_data(ext_uart_rx)             //接收到的一字节数据
+//     );
     
-always @(posedge clk_50M) begin //接收到缓冲区ext_uart_buffer
-    if(ext_uart_ready)begin
-        ext_uart_buffer <= ext_uart_rx;
-        ext_uart_avai <= 1;
-    end else if(!ext_uart_busy && ext_uart_avai)begin 
-        ext_uart_avai <= 0;
-    end
-end
-always @(posedge clk_50M) begin //将缓冲区ext_uart_buffer发送出去
-    if(!ext_uart_busy && ext_uart_avai)begin 
-        ext_uart_tx <= ext_uart_buffer;
-        ext_uart_start <= 1;
-    end else begin 
-        ext_uart_start <= 0;
-    end
-end
+// always @(posedge clk_50M) begin //接收到缓冲区ext_uart_buffer
+//     if(ext_uart_ready)begin
+//         ext_uart_buffer <= ext_uart_rx;
+//         ext_uart_avai <= 1;
+//     end else if(!ext_uart_busy && ext_uart_avai)begin 
+//         ext_uart_avai <= 0;
+//     end
+// end
+// always @(posedge clk_50M) begin //将缓冲区ext_uart_buffer发送出去
+//     if(!ext_uart_busy && ext_uart_avai)begin 
+//         ext_uart_tx <= ext_uart_buffer;
+//         ext_uart_start <= 1;
+//     end else begin 
+//         ext_uart_start <= 0;
+//     end
+// end
 
-async_transmitter #(.ClkFrequency(50000000),.Baud(9600)) //发送模块，9600无检验位
-    ext_uart_t(
-        .clk(clk_50M),                  //外部时钟信号
-        .TxD(txd),                      //串行信号输出
-        .TxD_busy(ext_uart_busy),       //发送器忙状态指示
-        .TxD_start(ext_uart_start),    //开始发送信号
-        .TxD_data(ext_uart_tx)        //待发送的数据
-    );
-
-//图像输出演示，分辨率800x600@75Hz，像素时钟为50MHz
-wire [11:0] hdata;
-assign video_red = hdata < 266 ? 3'b111 : 0; //红色竖条
-assign video_green = hdata < 532 && hdata >= 266 ? 3'b111 : 0; //绿色竖条
-assign video_blue = hdata >= 532 ? 2'b11 : 0; //蓝色竖条
-assign video_clk = clk_50M;
-vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
-    .clk(clk_50M), 
-    .hdata(hdata), //横坐标
-    .vdata(),      //纵坐标
-    .hsync(video_hsync),
-    .vsync(video_vsync),
-    .data_enable(video_de)
-);
-/* =========== Demo code end =========== */
+// async_transmitter #(.ClkFrequency(10000000),.Baud(9600)) //发送模块，9600无检验位
+//     ext_uart_t(
+//         .clk(clk_10M),                  //外部时钟信号
+//         .TxD(txd),                      //串行信号输出
+//         .TxD_busy(ext_uart_busy),       //发送器忙状态指示
+//         .TxD_start(ext_uart_start),    //开始发送信号
+//         .TxD_data(ext_uart_tx)        //待发送的数据
+//     );
 
 endmodule
