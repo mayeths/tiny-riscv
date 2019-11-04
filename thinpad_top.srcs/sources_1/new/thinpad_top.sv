@@ -80,6 +80,6 @@ module thinpad_top(
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
 
-
+    core core_1();
 
 endmodule
