@@ -86,7 +86,7 @@ module core (
 
   EXU exu_(
     //input
-    .pc(),
+    .pc4(),
     .imm32(),
     .rs1(),
     .rs2(),
