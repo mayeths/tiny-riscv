@@ -50,35 +50,40 @@ module core (
     .store_type()    // 传入lsu指示store的类型
   );
 
-  RegFile regfile_(
+  regfile regfile_(
     //input
     .clk(),
-    .rst(),
-    .dst_enable(),
-    .rs1_enable(),
-    .rs2_enable(),
-    .dst_addr(),
+    //TODO: 需要rst完成启动时reg初始化吗？reg会初始化为x或z从而导致undefined吗？
+    // .rst(),
     .rs1_addr(),
     .rs2_addr(),
+    .dst_addr(),
+    .dst_enable(),
     .dst_data(),
     //output
-    .rs1_data(),
-    .rs2_data()
-  );
-
-  Forward forward_(
-    //input
-    .rs1_addr(),
-    .rs2_addr(),
-    .dst_addr(),    // 检测rs1或rs2是否为上一指令的目的寄存器相同，是则forward
     .rs1_data(),
     .rs2_data(),
-    .dst_data(),
-    .dst_enable(),  // 上一指令是否写入寄存器，跳转和store置0从而不forward
-    //output
-    .rs1(),         // 接exu的rs1提供forward后的操作数1
-    .rs2(),         // 接exu的rs2提供forward后的操作数2
+    //accelerate LFU jalr
+    .jalr_addr(),
+    .jalr_data()
   );
+
+  //NOTE: 目前的3级流水和regfile来说，不需要forward.
+  //  你要问为什么？看一下regfile的源码就好了，read部分特判了dst_addr进行dst_data bypass
+  //  当变成4+级流水的时候，forward非最后一级。最后一级不需要forward，减少工作量。
+  //Forward forward_(
+  //  //input
+  //  .rs1_addr(),
+  //  .rs2_addr(),
+  //  .dst_addr(),    // 检测rs1或rs2是否为上一指令的目的寄存器相同，是则forward
+  //  .rs1_data(),
+  //  .rs2_data(),
+  //  .dst_data(),
+  //  .dst_enable(),  // 上一指令是否写入寄存器，跳转和store置0从而不forward
+  //  //output
+  //  .rs1(),         // 接exu的rs1提供forward后的操作数1
+  //  .rs2(),         // 接exu的rs2提供forward后的操作数2
+  //);
 
   EXU exu_(
     //input
