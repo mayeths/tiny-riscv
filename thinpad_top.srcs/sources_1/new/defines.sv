@@ -31,17 +31,29 @@ typedef logic [31:0]  uint32_t;
 `define OP_AMO    7'b0101111
 
 /**********************
- * Funct3.
+ * ALU action.
  *********************/
-`define F3_ADD  000
-`define F3_SUB  000  // ...应该是多余的
-`define F3_SLL  001
-`define F3_SLT  010
-`define F3_SLTU 011
-`define F3_XOR  100
-`define F3_SRL  101
-`define F3_SRA  101
-`define F3_OR   110
-`define F3_AND  111
+`define ALU_ADD  4'b0000
+`define ALU_SUB  4'b0001
+`define ALU_AND  4'b0010
+`define ALU_OR   4'b0011
+`define ALU_XOR  4'b0100
+`define ALU_SLL  4'b0101
+`define ALU_SRL  4'b0110
+`define ALU_SRA  4'b0111
+`define ALU_SLT  4'b1000
+`define ALU_SLTU 4'b1001
+
+/**********************
+ * Load/Store type.
+ *********************/
+`define LB  3'b000
+`define LH  3'b001
+`define LW  3'b010
+`define LBU 3'b011
+`define LHU 3'b100
+`define SB  3'b101
+`define SH  3'b110
+`define SW  3'b111
 
 `endif
