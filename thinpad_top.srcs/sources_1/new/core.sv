@@ -22,16 +22,12 @@ module core (
   );
 
   pipeline1 pipeline1_(
-    //input
     .clk(),
     .rst(),
-    .flush(),  // 接 exu 的 bpfail.
-    .stall(),  // 接 lsu 的 stall 信号
-    .if_pc(),
-    .if_inst(),
-    //output
-    .ex_pc(),
-    .ex_inst()
+    .flush(),     // 接 exu 的 bpfail.
+    .stall(),     // 接 lsu 的 stall 信号
+    .if_pc(),     .ex_pc(),
+    .if_inst(),   .ex_inst()
   );
 
   decode decode_(
@@ -94,33 +90,33 @@ module core (
     .op2_is_imm(),   // 指示op2使用imm32还是rs2
     .action(),       // 指示alu进行的操作
     //output
-    .bpfail(),       // 传回lfu的bpfail表明branch predict是否错误
     .out()           // 传入pipline2
   );
 
+  BPRU bpru_(
+    .is_beq(),
+    .is_bne(),
+    .is_blt(),
+    .is_bge(),
+    .is_bltu(),
+    .is_bgeu(),
+    .alu_out(),
+    .bpfail()         // 传回lfu的bpfail表明branch predict是否错误
+  );
+
   pipeline2 pipepine2_(
-    //input
     .clk(),
     .rst(),
     .flush(),
     .stall(),
-    .exu_alu_out(),
-    .exu_load_enable(),
-    .exu_load_type(),
-    .exu_store_enable(),
-    .exu_store_type(),
-    .exu_store_data(),   // 接rs2作为store的数据
-    .exu_dst_enable(),   // 该指令是否需要写回寄存器
-    .exu_dst_addr(),     // 写回的地址
-    //output
-    .lsu_alu_out(),
-    .lsu_load_enable(),
-    .lsu_load_type(),
-    .lsu_store_enable(),
-    .lsu_store_type(),
-    .lsu_store_data(),
-    .lsu_dst_enable(),
-    .lsu_dst_addr()
+    .exu_alu_out(),        .lsu_alu_out(),
+    .exu_load_enable(),    .lsu_load_enable(),
+    .exu_load_type(),      .lsu_load_type(),
+    .exu_store_enable(),   .lsu_store_enable(),
+    .exu_store_type(),     .lsu_store_type(),
+    .exu_store_data(),     .lsu_store_data(),
+    .exu_dst_enable(),     .lsu_dst_enable(),
+    .exu_dst_addr(),       .lsu_dst_addr()
   );
 
   LSU lsu_(
