@@ -54,7 +54,7 @@ module core (
     .csr_write_enable(),  // 接csrfile的write_enable
     .csru_action(),       // 接exu的csru_action指示csru进行的操作
     .uimm32(),            // 接exu的csru的uimm32
-    .exu_out_src()            // 接exu的exu_out_src指示exu应该输出什么
+    .exu_out_src()        // 接exu的exu_out_src指示exu应该输出什么
   );
 
   regfile regfile_(
@@ -117,7 +117,7 @@ module core (
     .uimm32(),
     .exu_out_src(),
     //output
-    .out(),          // 传入pipeline2
+    .exu_out(),      // 传入pipeline2
     .csr_out()
   );
 
