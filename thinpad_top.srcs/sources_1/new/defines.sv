@@ -1,8 +1,6 @@
 `ifndef DEFINE_V
 `define DEFINE_V
 
-typedef logic [31:0]  uint32_t;
-
 /*******************************************************************************
   Types of instruction.
   31            27 26 25 24   20 19   15 14    12 11          7 6      0
@@ -27,7 +25,7 @@ typedef logic [31:0]  uint32_t;
 `define OP_ALUI   7'b0010011
 `define OP_ALUR   7'b0110011
 `define OP_FENCE  7'b0001111
-`define OP_ENV    7'b1110011
+`define OP_CSR    7'b1110011
 `define OP_AMO    7'b0101111
 
 /**********************
@@ -43,6 +41,26 @@ typedef logic [31:0]  uint32_t;
 `define ALU_SRA  4'b0111
 `define ALU_SLT  4'b1000
 `define ALU_SLTU 4'b1001
+
+/**********************
+ * CSRU action.
+ *********************/
+`define CSR_ECALL  3'b000
+`define CSR_EBREAK 3'b001
+`define CSR_CSRRW  3'b010
+`define CSR_CSRRS  3'b011
+`define CSR_CSRRC  3'b100
+`define CSR_CSRRWI 3'b101
+`define CSR_CSRRSI 3'b110
+`define CSR_CSRRCI 3'b111
+
+/**********************
+ * EXU OUTPUT.
+ *********************/
+`define OUTPUT_ALU  2'b00
+`define OUTPUT_CSRU 2'b01
+`define OUTPUT_MDU  2'b10
+`define OUTPUT_FPU  2'b11
 
 /**********************
  * Load/Store type.

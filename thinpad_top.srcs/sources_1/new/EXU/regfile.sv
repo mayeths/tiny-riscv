@@ -1,17 +1,17 @@
 module regfile(
   input  logic clk,
-  //TODO: 需要rst完成启动时reg初始化吗？reg会初始化为x或z从而导致undefined吗？
-  //input  logic rst,  
+  input  logic rst,  
   input  logic[4:0]  rs1_addr,
   input  logic[4:0]  rs2_addr,
   input  logic[4:0]  dst_addr,
   input  logic dst_enable,
   input  logic[31:0] dst_data,
+
   output logic[31:0] rs1_data,
-  output logic[31:0] rs2_data
+  output logic[31:0] rs2_data,
   // accelerate LFU jalr
   input  logic[4:0]  jalr_addr,
-  output logic[31:0] jalr_data,
+  output logic[31:0] jalr_data
 );
 
   reg [31:0] regs[31:1];
@@ -31,15 +31,12 @@ module regfile(
     regs[jalr_addr];
 
   ////////Write////////
-  // integer i;
-  // always @(posedge clk) begin
-  //   if (rst)
-  //     for (i = 1; i < 32; )
-  //   else if (dst_enable && dst_addr != 5'b00000)
-  //     regs[dst_addr] <= dst_data;
-  // end
+  integer i;
   always @(posedge clk) begin
-    if (dst_enable && dst_addr != 5'b00000)
+    if (rst)
+      for (i = 1; i < 32; i = i + 1)
+         regs[i] <= 32'b0;
+    else if (dst_enable && dst_addr != 5'b00000)
       regs[dst_addr] <= dst_data;
   end
 

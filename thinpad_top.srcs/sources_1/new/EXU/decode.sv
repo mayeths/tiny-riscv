@@ -1,22 +1,33 @@
 // Decode Unit: 译码单元
 // 用于对IFU提供的指令进行译码
-`include "../defines.sv"
+`include "../defines.sv";
 
 module decode (
   input  logic[31:0] inst,
+
+  //normal instruction
   output logic rs1_enable,
   output logic rs2_enable,
   output logic[4:0] rs1_addr,
   output logic[4:0] rs2_addr,
   output logic[3:0] alu_action,
-  output logic op1_is_pc4,
+  output logic op1_is_pc,
   output logic op2_is_imm,
   output logic[31:0] imm32,
   output logic dst_enable,
   output logic[4:0] dst_addr,
   output logic load_enable,
   output logic store_enable,
-  output logic[3:0] ls_type
+  output logic[2:0] load_type,
+  output logic[1:0] store_type,
+  //csr instruction
+  output logic[12:0] csr_addr,
+  output logic csr_read_enable,
+  output logic csr_write_enable,
+  output logic[3:0] csru_action,
+  output logic[31:0] uimm32,
+  //detemine exu output result of alu, or csru (even mdu, or fpu)?
+  output logic[2:0] exu_out_src
 );
 
   //TODO: please test these logic. All of them.
@@ -38,7 +49,7 @@ module decode (
   logic belong_alui   = opcode == `OP_ALUI;
   logic belong_alur   = opcode == `OP_ALUR;
   logic belong_fence  = opcode == `OP_FENCE;
-  logic belong_env    = opcode == `OP_ENV;
+  logic belong_csr    = opcode == `OP_CSR;
   logic belong_amo    = opcode == `OP_AMO;
   logic func3_000     = func3  == 3'b000;
   logic func3_001     = func3  == 3'b001;
@@ -50,7 +61,7 @@ module decode (
   logic func3_111     = func3  == 3'b111;
 
   ////////
-  //misc
+  //misc instruction
   logic is_lui   = opcode == `OP_LUI;
   logic is_auipc = opcode == `OP_AUIPC;
   logic is_jal   = opcode == `OP_JAL;
@@ -97,14 +108,14 @@ module decode (
   logic is_fence  = belong_fence & func3_000;
   logic is_fencei = belong_fence & func3_001
   //env
-  logic is_ecall  = belong_env & func3_000 & (rs2 == 5'b00000);
-  logic is_ebreak = belong_env & func3_000 & (rs2 == 5'b00001);
-  logic is_csrrw  = belong_env & func3_001;
-  logic is_csrrs  = belong_env & func3_010;
-  logic is_csrrc  = belong_env & func3_011;
-  logic is_csrrwi = belong_env & func3_101;
-  logic is_csrrsi = belong_env & func3_110;
-  logic is_csrrci = belong_env & func3_111;
+  logic is_ecall  = belong_csr & func3_000 & (rs2 == 5'b00000);
+  logic is_ebreak = belong_csr & func3_000 & (rs2 == 5'b00001);
+  logic is_csrrw  = belong_csr & func3_001;
+  logic is_csrrs  = belong_csr & func3_010;
+  logic is_csrrc  = belong_csr & func3_011;
+  logic is_csrrwi = belong_csr & func3_101;
+  logic is_csrrsi = belong_csr & func3_110;
+  logic is_csrrci = belong_csr & func3_111;
   //amo
   logic is_lrw      = belong_amo & func3_010 & (funct7[6:2] == 5'b00010);
   logic is_scw      = belong_amo & func3_010 & (funct7[6:2] == 5'b00011);
@@ -131,11 +142,11 @@ module decode (
   logic need_slt  = is_slti  | is_slt;
   logic need_sltu = is_sltiu | is_sltu;
   //imm32. See p.17 & figure 2.3 of riscv-spec.pdf.
-  logic imm32_Itype = {{21{inst[31]}}, inst[30:25], inst[24:21], inst[20]};
-  logic imm32_Stype = {{21{inst[31]}}, inst[30:25], inst[11:8],  inst[7]};
-  logic imm32_Btype = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; //Useless. IFU has calc this for branch.
-  logic imm32_Utype = {inst[31], inst[30:20], inst[19:12], 12'b0};
-  logic imm32_Jtype = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0};
+  logic [31:0] imm32_Itype = {{21{inst[31]}}, inst[30:25], inst[24:21], inst[20]};
+  logic [31:0] imm32_Stype = {{21{inst[31]}}, inst[30:25], inst[11:8],  inst[7]};
+  logic [31:0] imm32_Btype = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; //Useless. IFU has calc this for branch.
+  logic [31:0] imm32_Utype = {inst[31], inst[30:20], inst[19:12], 12'b0};
+  logic [31:0] imm32_Jtype = 32'h4;  // jal, jalr
   //instruction type, to detemine imm32.
   logic Itype = is_jalr | belong_load | belong_alui;
   logic Stype = belong_store;
@@ -147,17 +158,36 @@ module decode (
    * Decode results.
    *********************/
 
+  //bus.
+  assign rs1_addr = is_lui ? 5'b00000 : rs1;
+  assign rs2_addr = rs2;
+  assign imm32 =
+    Itype ? imm32_Itype :
+    Stype ? imm32_Stype :
+    Utype ? imm32_Utype :
+    Jtype ? imm32_Jtype :
+    32'b0;
+  assign dst_addr = rd;
+  assign load_type =
+    is_lb  ? `LB  :
+    is_lh  ? `LH  :
+    is_lw  ? `LW  :
+    is_lbu ? `LBU :
+    is_lhu ? `LHU :
+    3'b0;
+  assign store_type =
+    is_sb  ? `SB  :
+    is_sh  ? `SH  :
+    is_sw  ? `SW  :
+    3'b0;
   //control signals.
   assign rs1_enable   = belong_branch | belong_load  | belong_store | belong_alui | belong_alur;
   assign rs2_enable   = belong_branch | belong_store | belong_alur;
   assign dst_enable   = is_lui | is_auipc | is_jal | is_jalr | belong_load | belong_alui | belong_alur;
   assign load_enable  = belong_load;
   assign store_enable = belong_store;
-  assign op1_is_pc4   = is_auipc | is_jal   | is_jalr;
+  assign op1_is_pc    = is_auipc | is_jal   | is_jalr;
   assign op2_is_imm   = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | belong_alui;
-  //bus.
-  assign rs1_addr = is_lui           ? 5'b00000 : rs1;
-  assign rs2_addr = is_jal | is_jalr ? 5'b00000 : rs2;
   assign alu_action =
     need_add  ? `ALU_ADD  :
     need_sub  ? `ALU_SUB  :
@@ -170,23 +200,31 @@ module decode (
     need_slt  ? `ALU_SLT  :
     need_sltu ? `ALU_SLTU :
     4'b0;
-  assign imm32 =
-    Itype ? imm32_Itype :
-    Stype ? imm32_Stype :
-    Btype ? imm32_Btype :
-    Utype ? imm32_Utype :
-    Jtype ? imm32_Jtype :
-    32'b0;
-  assign dst_addr = rd;
-  assign ls_type =
-    is_lb  ? `LB  :
-    is_lh  ? `LH  :
-    is_lw  ? `LW  :
-    is_lbu ? `LBU :
-    is_lhu ? `LHU :
-    is_sb  ? `SB  :
-    is_sh  ? `SH  :
-    is_sw  ? `SW  :
+
+  //csr bus & constrol signals.
+  //See p.54 Table 9.1 of riscv-spec.pdf to check csr_read_enable & csr_write_enable.
+  assign csr_addr = inst[20:31];
+  assign csr_read_enable  = ((is_csrrw | is_csrrwi) & (rd != 5'b00000)) | is_csrrs | is_csrrsi | is_csrrc | is_csrrci;
+  assign csr_write_enable = is_csrrw | is_csrrwi | ((is_csrrs | is_csrrsi | is_csrrc | is_csrrci) & (rs1 != 5'b00000));
+  assign csru_action =
+    is_ecall  ? `CSR_ECALL  :
+    is_ebreak ? `CSR_EBREAK :
+    is_csrrw  ? `CSR_CSRRW  :
+    is_csrrs  ? `CSR_CSRRS  :
+    is_csrrc  ? `CSR_CSRRC  :
+    is_csrrwi ? `CSR_CSRRWI :
+    is_csrrsi ? `CSR_CSRRSI :
+    is_csrrci ? `CSR_CSRRCI :
     3'b0;
+  assign uimm32 = {27'b0, inst[19:15]};
+
+  assign exu_out_src = belong_csr ? `OUTPUT_CSRU : `OUTPUT_ALU;
+  //Use the following exu_out_src if we add MDU & FPU
+  //assign exu_out_src =
+  //  belong_csr ? `OUTPUT_CSRU :
+  //  belong_md  ? `OUTPUT_MDU  :
+  //  belong_fp  ? `OUTPUT_FPU  :
+  //  `OUTPUT_ALU;
+
 
 endmodule

@@ -9,8 +9,6 @@ module core (
 );
 
   LFU lfu_(
-    //TODO: AXI握手拿指令
-    //NOTE: 在lfu内记录branch的另一个可能地址，当branch predict fail(bpfail)时改成读这个地址
     //input
     .clk(),
     .rst(),
@@ -19,6 +17,9 @@ module core (
     //output
     .pc(),
     .inst(),
+    //jalr accelerate
+    .jalr_addr(),
+    .jalr_data()
   );
 
   pipeline1 pipeline1_(
@@ -32,29 +33,34 @@ module core (
 
   decode decode_(
     //input
-    .inst(),          // pipeline1的ex_inst
+    .inst(),              // pipeline1的ex_inst
     //output
-    .rs1_enable(),   // 接regfile的rs1_enable
-    .rs2_enable(),   // 接regfile的rs2_enable
-    .rs1_addr(),     // 接regfile的rs1_addr
-    .rs2_addr(),     // 接regfile的rs2_addr
-    .alu_action(),   // 接exu的action指示alu进行的操作
-    .op1_is_pc(),    // 接exu指示op1使用pc还是rs1
-    .op2_is_imm(),   // 接exu指示op2使用imm32还是rs2
-    .imm32()         // 将instrution里的分散imm位整合成32bit形状再输出
-    .dst_enable(),   // 传入lsu阶段指示是否写回寄存器，由LSU阶段接回regfile的dst_enable。跳转和store置为0
-    .dst_addr(),     // 传入lsu阶段指示是否写回寄存器，由LSU阶段接回regfile的dst_enable。跳转和store置为0
-    .load_enable(),  // 传入lsu指示是否为load指令
-    .load_type(),    // 传入lsu指示load的类型
-    .store_enable(), // 传入lsu指示是否为store指令
-    .store_type()    // 传入lsu指示store的类型
+    .rs1_enable(),        // 接regfile的rs1_enable
+    .rs2_enable(),        // 接regfile的rs2_enable
+    .rs1_addr(),          // 接regfile的rs1_addr
+    .rs2_addr(),          // 接regfile的rs2_addr
+    .alu_action(),        // 接exu的alu_action指示alu进行的操作
+    .op1_is_pc(),         // 接exu指示op1使用pc还是rs1
+    .op2_is_imm(),        // 接exu指示op2使用imm32还是rs2
+    .imm32()              // 将instrution里的分散imm位整合成32bit形状再输出
+    .dst_enable(),        // 传入lsu阶段指示是否写回寄存器，由LSU阶段接回regfile的dst_enable。跳转和store置为0
+    .dst_addr(),          // 传入lsu阶段指示是否写回寄存器，由LSU阶段接回regfile的dst_enable。跳转和store置为0
+    .load_enable(),       // 传入lsu指示是否为load指令
+    .store_enable(),      // 传入lsu指示是否为store指令
+    .load_type(),         // 传入lsu指示load的类型
+    .store_type(),        // 传入lsu指示store的类型
+    .csr_addr(),          // 接csrfile的read_idx和write_idx
+    .csr_read_enable(),   // 接csrfile的read_enable
+    .csr_write_enable(),  // 接csrfile的write_enable
+    .csru_action(),       // 接exu的csru_action指示csru进行的操作
+    .uimm32(),            // 接exu的csru的uimm32
+    .exu_out_src()            // 接exu的exu_out_src指示exu应该输出什么
   );
 
   regfile regfile_(
     //input
     .clk(),
-    //TODO: 需要rst完成启动时reg初始化吗？reg会初始化为x或z从而导致undefined吗？
-    // .rst(),
+    .rst(),
     .rs1_addr(),
     .rs2_addr(),
     .dst_addr(),
@@ -63,9 +69,20 @@ module core (
     //output
     .rs1_data(),
     .rs2_data(),
-    //accelerate LFU jalr
+    //LFU jalr accelerate
     .jalr_addr(),
     .jalr_data()
+  );
+
+  csrfile csrfile_(
+    .clk(),
+    .rst(),
+    .read_enable(),
+    .write_enable(),
+    .read_idx(),
+    .write_idx(),
+    .write_data(),
+    .read_data()
   );
 
   //NOTE: 目前的3级流水和regfile来说，不需要forward.
@@ -85,20 +102,27 @@ module core (
   //  .rs2(),         // 接exu的rs2提供forward后的操作数2
   //);
 
-  EXU exu_(
+  //FIXME: auipc use pc.
+  exu exu_(
     //input
-    .pc4(),
-    .imm32(),
     .rs1(),
     .rs2(),
+    .pc(),
+    .imm32(),
     .op1_is_pc(),    // 指示op1使用pc还是rs1
     .op2_is_imm(),   // 指示op2使用imm32还是rs2
-    .action(),       // 指示alu进行的操作
+    .alu_action(),   // 指示alu进行的操作
+    .csr(),          // 接csrfile的read_data
+    .csru_action(),
+    .uimm32(),
+    .exu_out_src(),
     //output
-    .out()           // 传入pipline2
+    .out(),          // 传入pipeline2
+    .csr_out()
   );
 
   BPRU bpru_(
+    //input
     .is_beq(),
     .is_bne(),
     .is_blt(),
@@ -106,6 +130,7 @@ module core (
     .is_bltu(),
     .is_bgeu(),
     .alu_out(),
+    //output
     .bpfail()         // 传回lfu的bpfail表明branch predict是否错误
   );
 
