@@ -16,6 +16,9 @@ module regfile(
   reg [31:0] regs[31:1];
 
   ////////Read////////
+  //NOTE: A useful hint is that we can't bypass dst_data to output when dst_addr == 5'b00000
+  //      since dst_data may not equal 32'b0 all the time. But it's OK here since the first
+  //      line(like rs1_addr == 5'b00000) takes effect first.
   assign rs1_data =
     (rs1_addr == 5'b00000) ? 32'b0 :
     (rs1_addr == dst_addr && dst_enable) ? dst_data :
