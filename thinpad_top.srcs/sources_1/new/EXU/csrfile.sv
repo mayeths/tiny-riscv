@@ -46,6 +46,32 @@ module csrfile(
   reg [31:0] csr_dscratch0;
   reg [31:0] csr_dscratch1;
 
+  //TODO: some csr use non-trival initial value, specify them here.
+  wire [31:0] init_mvendorid     = 32'b0;
+  wire [31:0] init_marchid       = 32'b0;
+  wire [31:0] init_mimpid        = 32'b0;
+  wire [31:0] init_mhartid       = 32'b0;
+  wire [31:0] init_mstatus       = 32'b0;
+  wire [31:0] init_misa          = 32'b0;
+  wire [31:0] init_medeleg       = 32'b0;
+  wire [31:0] init_mideleg       = 32'b0;
+  wire [31:0] init_mie           = 32'b0;
+  wire [31:0] init_mtvec         = 32'b0;
+  wire [31:0] init_mcounteren    = 32'b0;
+  wire [31:0] init_mscratch      = 32'b0;
+  wire [31:0] init_mepc          = 32'b0;
+  wire [31:0] init_mcause        = 32'b0;
+  wire [31:0] init_mtval         = 32'b0;
+  wire [31:0] init_mip           = 32'b0;
+  wire [31:0] init_mcycle        = 32'b0;
+  wire [31:0] init_minstret      = 32'b0;
+  wire [31:0] init_mcycleh       = 32'b0;
+  wire [31:0] init_minstreth     = 32'b0;
+  wire [31:0] init_mcountinhibit = 32'b0;
+  wire [31:0] init_dcsr          = 32'b0;
+  wire [31:0] init_dpc           = 32'b0;
+  wire [31:0] init_dscratch0     = 32'b0;
+  wire [31:0] init_dscratch1     = 32'b0;
 
   ////////signal////////
   wire rd_mvendorid     = read_enable & (read_idx == 12'hF11);
@@ -102,58 +128,58 @@ module csrfile(
 
   ////////bus////////
   //TODO: some csr use non-trival input, specify them here.
-  wire in_mvendorid     = write_data;
-  wire in_marchid       = write_data;
-  wire in_mimpid        = write_data;
-  wire in_mhartid       = write_data;
-  wire in_mstatus       = write_data;
-  wire in_misa          = write_data;
-  wire in_medeleg       = write_data;
-  wire in_mideleg       = write_data;
-  wire in_mie           = write_data;
-  wire in_mtvec         = write_data;
-  wire in_mcounteren    = write_data;
-  wire in_mscratch      = write_data;
-  wire in_mepc          = write_data;
-  wire in_mcause        = write_data;
-  wire in_mtval         = write_data;
-  wire in_mip           = write_data;
-  wire in_mcycle        = write_data;
-  wire in_minstret      = write_data;
-  wire in_mcycleh       = write_data;
-  wire in_minstreth     = write_data;
-  wire in_mcountinhibit = write_data;
-  wire in_dcsr          = write_data;
-  wire in_dpc           = write_data;
-  wire in_dscratch0     = write_data;
-  wire in_dscratch1     = write_data;
+  wire [31:0] in_mvendorid     = write_data;
+  wire [31:0] in_marchid       = write_data;
+  wire [31:0] in_mimpid        = write_data;
+  wire [31:0] in_mhartid       = write_data;
+  wire [31:0] in_mstatus       = write_data;
+  wire [31:0] in_misa          = write_data;
+  wire [31:0] in_medeleg       = write_data;
+  wire [31:0] in_mideleg       = write_data;
+  wire [31:0] in_mie           = write_data;
+  wire [31:0] in_mtvec         = write_data;
+  wire [31:0] in_mcounteren    = write_data;
+  wire [31:0] in_mscratch      = write_data;
+  wire [31:0] in_mepc          = write_data;
+  wire [31:0] in_mcause        = write_data;
+  wire [31:0] in_mtval         = write_data;
+  wire [31:0] in_mip           = write_data;
+  wire [31:0] in_mcycle        = write_data;
+  wire [31:0] in_minstret      = write_data;
+  wire [31:0] in_mcycleh       = write_data;
+  wire [31:0] in_minstreth     = write_data;
+  wire [31:0] in_mcountinhibit = write_data;
+  wire [31:0] in_dcsr          = write_data;
+  wire [31:0] in_dpc           = write_data;
+  wire [31:0] in_dscratch0     = write_data;
+  wire [31:0] in_dscratch1     = write_data;
   //
   //TODO: some csr use non-trival output, specify them here.
-  wire out_mvendorid     = csr_mvendorid;
-  wire out_marchid       = csr_marchid;
-  wire out_mimpid        = csr_mimpid;
-  wire out_mhartid       = csr_mhartid;
-  wire out_mstatus       = csr_mstatus;
-  wire out_misa          = csr_misa;
-  wire out_medeleg       = csr_medeleg;
-  wire out_mideleg       = csr_mideleg;
-  wire out_mie           = csr_mie;
-  wire out_mtvec         = csr_mtvec;
-  wire out_mcounteren    = csr_mcounteren;
-  wire out_mscratch      = csr_mscratch;
-  wire out_mepc          = csr_mepc;
-  wire out_mcause        = csr_mcause;
-  wire out_mtval         = csr_mtval;
-  wire out_mip           = csr_mip;
-  wire out_mcycle        = csr_mcycle;
-  wire out_minstret      = csr_minstret;
-  wire out_mcycleh       = csr_mcycleh;
-  wire out_minstreth     = csr_minstreth;
-  wire out_mcountinhibit = csr_mcountinhibit;
-  wire out_dcsr          = csr_dcsr;
-  wire out_dpc           = csr_dpc;
-  wire out_dscratch0     = csr_dscratch0;
-  wire out_dscratch1     = csr_dscratch1;
+  wire [31:0] out_mvendorid     = csr_mvendorid;
+  wire [31:0] out_marchid       = csr_marchid;
+  wire [31:0] out_mimpid        = csr_mimpid;
+  wire [31:0] out_mhartid       = csr_mhartid;
+  wire [31:0] out_mstatus       = csr_mstatus;
+  wire [31:0] out_misa          = csr_misa;
+  wire [31:0] out_medeleg       = csr_medeleg;
+  wire [31:0] out_mideleg       = csr_mideleg;
+  wire [31:0] out_mie           = csr_mie;
+  wire [31:0] out_mtvec         = csr_mtvec;
+  wire [31:0] out_mcounteren    = csr_mcounteren;
+  wire [31:0] out_mscratch      = csr_mscratch;
+  wire [31:0] out_mepc          = csr_mepc;
+  wire [31:0] out_mcause        = csr_mcause;
+  wire [31:0] out_mtval         = csr_mtval;
+  wire [31:0] out_mip           = csr_mip;
+  wire [31:0] out_mcycle        = csr_mcycle;
+  wire [31:0] out_minstret      = csr_minstret;
+  wire [31:0] out_mcycleh       = csr_mcycleh;
+  wire [31:0] out_minstreth     = csr_minstreth;
+  wire [31:0] out_mcountinhibit = csr_mcountinhibit;
+  wire [31:0] out_dcsr          = csr_dcsr;
+  wire [31:0] out_dpc           = csr_dpc;
+  wire [31:0] out_dscratch0     = csr_dscratch0;
+  wire [31:0] out_dscratch1     = csr_dscratch1;
 
   ////////read////////
   //Use parallel or-and wire to read data.
@@ -187,31 +213,31 @@ module csrfile(
 
   ////////write////////
   always @(posedge clk) begin
-    csr_mvendorid     <= rst ? 32'b0 : in_mvendorid;
-    csr_marchid       <= rst ? 32'b0 : in_marchid;
-    csr_mimpid        <= rst ? 32'b0 : in_mimpid;
-    csr_mhartid       <= rst ? 32'b0 : in_mhartid;
-    csr_mstatus       <= rst ? 32'b0 : in_mstatus;
-    csr_misa          <= rst ? 32'b0 : in_misa;
-    csr_medeleg       <= rst ? 32'b0 : in_medeleg;
-    csr_mideleg       <= rst ? 32'b0 : in_mideleg;
-    csr_mie           <= rst ? 32'b0 : in_mie;
-    csr_mtvec         <= rst ? 32'b0 : in_mtvec;
-    csr_mcounteren    <= rst ? 32'b0 : in_mcounteren;
-    csr_mscratch      <= rst ? 32'b0 : in_mscratch;
-    csr_mepc          <= rst ? 32'b0 : in_mepc;
-    csr_mcause        <= rst ? 32'b0 : in_mcause;
-    csr_mtval         <= rst ? 32'b0 : in_mtval;
-    csr_mip           <= rst ? 32'b0 : in_mip;
-    csr_mcycle        <= rst ? 32'b0 : in_mcycle;
-    csr_minstret      <= rst ? 32'b0 : in_minstret;
-    csr_mcycleh       <= rst ? 32'b0 : in_mcycleh;
-    csr_minstreth     <= rst ? 32'b0 : in_minstreth;
-    csr_mcountinhibit <= rst ? 32'b0 : in_mcountinhibit;
-    csr_dcsr          <= rst ? 32'b0 : in_dcsr;
-    csr_dpc           <= rst ? 32'b0 : in_dpc;
-    csr_dscratch0     <= rst ? 32'b0 : in_dscratch0;
-    csr_dscratch1     <= rst ? 32'b0 : in_dscratch1;
+    csr_mvendorid     <= rst ? init_mvendorid     : in_mvendorid;
+    csr_marchid       <= rst ? init_marchid       : in_marchid;
+    csr_mimpid        <= rst ? init_mimpid        : in_mimpid;
+    csr_mhartid       <= rst ? init_mhartid       : in_mhartid;
+    csr_mstatus       <= rst ? init_mstatus       : in_mstatus;
+    csr_misa          <= rst ? init_misa          : in_misa;
+    csr_medeleg       <= rst ? init_medeleg       : in_medeleg;
+    csr_mideleg       <= rst ? init_mideleg       : in_mideleg;
+    csr_mie           <= rst ? init_mie           : in_mie;
+    csr_mtvec         <= rst ? init_mtvec         : in_mtvec;
+    csr_mcounteren    <= rst ? init_mcounteren    : in_mcounteren;
+    csr_mscratch      <= rst ? init_mscratch      : in_mscratch;
+    csr_mepc          <= rst ? init_mepc          : in_mepc;
+    csr_mcause        <= rst ? init_mcause        : in_mcause;
+    csr_mtval         <= rst ? init_mtval         : in_mtval;
+    csr_mip           <= rst ? init_mip           : in_mip;
+    csr_mcycle        <= rst ? init_mcycle        : in_mcycle;
+    csr_minstret      <= rst ? init_minstret      : in_minstret;
+    csr_mcycleh       <= rst ? init_mcycleh       : in_mcycleh;
+    csr_minstreth     <= rst ? init_minstreth     : in_minstreth;
+    csr_mcountinhibit <= rst ? init_mcountinhibit : in_mcountinhibit;
+    csr_dcsr          <= rst ? init_dcsr          : in_dcsr;
+    csr_dpc           <= rst ? init_dpc           : in_dpc;
+    csr_dscratch0     <= rst ? init_dscratch0     : in_dscratch0;
+    csr_dscratch1     <= rst ? init_dscratch1     : in_dscratch1;
   end
 
 
