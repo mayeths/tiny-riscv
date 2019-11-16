@@ -21,7 +21,7 @@ module decode (
   output logic[2:0] load_type,
   output logic[1:0] store_type,
   //csr instruction
-  output logic[12:0] csr_addr,
+  output logic[11:0] csr_addr,
   output logic csr_read_enable,
   output logic csr_write_enable,
   output logic[3:0] csru_action,
