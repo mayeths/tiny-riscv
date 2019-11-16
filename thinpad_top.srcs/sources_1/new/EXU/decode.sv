@@ -36,12 +36,12 @@ module decode (
 
   ////////
   //basic
-  logic opcode = inst[6:0];
-  logic rd     = inst[11:7];
-  logic funct3 = inst[14:12];
-  logic rs1    = inst[19:15];
-  logic rs2    = inst[24:20];
-  logic funct7 = inst[31:25];
+  logic [6:0] opcode = inst[6:0];
+  logic [4:0] rd     = inst[11:7];
+  logic [2:0] funct3 = inst[14:12];
+  logic [4:0] rs1    = inst[19:15];
+  logic [4:0] rs2    = inst[24:20];
+  logic [6:0] funct7 = inst[31:25];
   logic belong_branch = opcode == `OP_BRANCH;
   logic belong_load   = opcode == `OP_LOAD;
   logic belong_store  = opcode == `OP_STORE;
@@ -93,16 +93,16 @@ module decode (
   logic is_srli  = belong_alui & func3_101 & (funct7 == 7'b0000000);
   logic is_srai  = belong_alui & func3_101 & (funct7 == 7'b0100000);
   //alur
-  logic is_add  = belong_alui & func3_000 & (funct7 == 7'b0000000);
-  logic is_sub  = belong_alui & func3_000 & (funct7 == 7'b0100000);
-  logic is_sll  = belong_alui & func3_001;
-  logic is_slt  = belong_alui & func3_010;
-  logic is_sltu = belong_alui & func3_011;
-  logic is_xor  = belong_alui & func3_100;
-  logic is_srl  = belong_alui & func3_101 & (funct7 == 7'b0000000);
-  logic is_sra  = belong_alui & func3_101 & (funct7 == 7'b0100000);
-  logic is_or   = belong_alui & func3_110;
-  logic is_and  = belong_alui & func3_111;
+  logic is_add  = belong_alur & func3_000 & (funct7 == 7'b0000000);
+  logic is_sub  = belong_alur & func3_000 & (funct7 == 7'b0100000);
+  logic is_sll  = belong_alur & func3_001;
+  logic is_slt  = belong_alur & func3_010;
+  logic is_sltu = belong_alur & func3_011;
+  logic is_xor  = belong_alur & func3_100;
+  logic is_srl  = belong_alur & func3_101 & (funct7 == 7'b0000000);
+  logic is_sra  = belong_alur & func3_101 & (funct7 == 7'b0100000);
+  logic is_or   = belong_alur & func3_110;
+  logic is_and  = belong_alur & func3_111;
   //fence
   logic is_fence  = belong_fence & func3_000;
   logic is_fencei = belong_fence & func3_001;
@@ -138,20 +138,18 @@ module decode (
   logic need_sll  = is_slli  | is_sll;
   logic need_srl  = is_srli  | is_srl;
   logic need_sra  = is_srai  | is_sra;
-  logic need_slt  = is_slti  | is_slt;
-  logic need_sltu = is_sltiu | is_sltu;
-  //imm32. See p.17 & figure 2.3 of riscv-spec.pdf.
+  logic need_slt  = is_blt   | is_bge   | is_slti  | is_slt;
+  logic need_sltu = is_bltu  | is_bgeu  | is_sltiu | is_sltu;
+  //imm32. See p.18 & figure 2.4 of riscv-spec.pdf.
   logic [31:0] imm32_Itype = {{21{inst[31]}}, inst[30:25], inst[24:21], inst[20]};
   logic [31:0] imm32_Stype = {{21{inst[31]}}, inst[30:25], inst[11:8],  inst[7]};
-  logic [31:0] imm32_Btype = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; //Useless. IFU has calc this for branch.
   logic [31:0] imm32_Utype = {inst[31], inst[30:20], inst[19:12], 12'b0};
-  logic [31:0] imm32_Jtype = 32'h4;  // jal, jalr
+  logic [31:0] imm32_Jtype = 32'h4;  // jal, jalr store pc+4 to rd(instead of pc+imm+4).
   //instruction type, to detemine imm32.
-  logic Itype = is_jalr | belong_load | belong_alui;
+  logic Itype = belong_load | belong_alui | is_fencei;  // note that imm32_Itype contains shamt for sll.
   logic Stype = belong_store;
-  logic Btype = belong_branch;
   logic Utype = is_lui | is_auipc;
-  logic Jtype = is_jal;
+  logic Jtype = is_jal | is_jalr;  // Though jalr belong to Itype, it use 32'h4 as imm32.
 
   /**********************
    * Decode results.
@@ -174,19 +172,19 @@ module decode (
     | ({3{is_lbu}} & `LBU)
     | ({3{is_lhu}} & `LHU)
     ;
-  assign store_type = 3'b0
+  assign store_type = 2'b0
     | ({2{is_sb}} & `SB)
     | ({2{is_sh}} & `SH)
     | ({2{is_sw}} & `SW)
     ;
   //control signals.
-  assign rs1_enable   = belong_branch | belong_load  | belong_store | belong_alui | belong_alur;
+  assign rs1_enable   = is_lui | belong_branch | belong_load | belong_store | belong_alui | belong_alur;
   assign rs2_enable   = belong_branch | belong_store | belong_alur;
   assign dst_enable   = is_lui | is_auipc | is_jal | is_jalr | belong_load | belong_alui | belong_alur;
   assign load_enable  = belong_load;
   assign store_enable = belong_store;
   assign op1_is_pc    = is_auipc | is_jal   | is_jalr;
-  assign op2_is_imm   = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | belong_alui;
+  assign op2_is_imm   = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | belong_alui | is_fencei;
   assign alu_action = 4'b0
     | ({4{need_add }} & `ALU_ADD )
     | ({4{need_sub }} & `ALU_SUB )
@@ -202,7 +200,7 @@ module decode (
 
   //csr bus & constrol signals.
   //See p.54 Table 9.1 of riscv-spec.pdf to check csr_read_enable & csr_write_enable.
-  assign csr_addr = inst[20:31];
+  assign csr_addr = inst[31:20];
   assign csr_read_enable  = ((is_csrrw | is_csrrwi) & (rd != 5'b00000)) | is_csrrs | is_csrrsi | is_csrrc | is_csrrci;
   assign csr_write_enable = is_csrrw | is_csrrwi | ((is_csrrs | is_csrrsi | is_csrrc | is_csrrci) & (rs1 != 5'b00000));
   assign csru_action = 3'b0
