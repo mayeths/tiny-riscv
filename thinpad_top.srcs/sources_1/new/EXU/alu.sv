@@ -8,6 +8,7 @@
 // sll, srl, sra:    in1 = rs1, in2 = rs2
 // slli, srli, srai: in1 = rs1, in2 = imm(shamt)
 
+`include "../defines.sv";
 
 module ALU(
   input  logic[31:0] in1,
@@ -17,7 +18,7 @@ module ALU(
   output logic[31:0] out
 );
 
-  ////////
+  //bus
   logic [31:0] add_out  = in1 + in2;
   logic [31:0] sub_out  = in1 - in2;
   logic [31:0] and_out  = in1 & in2;
@@ -31,19 +32,30 @@ module ALU(
   logic [31:0] sra_out  = ({{32{in1[31]}}, in1} >> in2[4:0]);
   logic [31:0] slt_out  = {31'b0, in1[31] != in2[31] ? in1[31] : sub_out[31]};
   logic [31:0] sltu_out = {31'b0, sub_out[31]};
+  //signal
+  logic need_add  = action == `ALU_ADD;
+  logic need_sub  = action == `ALU_SUB;
+  logic need_and  = action == `ALU_AND;
+  logic need_or   = action == `ALU_OR;
+  logic need_xor  = action == `ALU_XOR;
+  logic need_sll  = action == `ALU_SLL;
+  logic need_srl  = action == `ALU_SRL;
+  logic need_sra  = action == `ALU_SRA;
+  logic need_slt  = action == `ALU_SLT;
+  logic need_sltu = action == `ALU_SLTU;
 
   ////////
-  assign out =
-    (action == `ALU_ADD)  ? add_out :
-    (action == `ALU_SUB)  ? sub_out :
-    (action == `ALU_AND)  ? and_out :
-    (action == `ALU_OR)   ? or_out  :
-    (action == `ALU_XOR)  ? xor_out :
-    (action == `ALU_SLL)  ? sll_out :
-    (action == `ALU_SRL)  ? srl_out :
-    (action == `ALU_SRA)  ? sra_out :
-    (action == `ALU_SLT)  ? slt_out :
-    (action == `ALU_SLTU) ? sltu_out :
-    32'b0;
+  assign out = 32'b0
+    | ({32{need_add}}  & add_out)
+    | ({32{need_sub}}  & add_out)
+    | ({32{need_and}}  & add_out)
+    | ({32{need_or }}  & add_out)
+    | ({32{need_xor}}  & add_out)
+    | ({32{need_sll}}  & add_out)
+    | ({32{need_srl}}  & add_out)
+    | ({32{need_sra}}  & add_out)
+    | ({32{need_slt}}  & add_out)
+    | ({32{need_sltu}} & add_out)
+    ;
 
 endmodule

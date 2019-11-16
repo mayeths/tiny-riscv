@@ -3,8 +3,8 @@ module pipeline1(
   input wire rst,
   input wire flush,
   input wire stall,
-  input wire if_pc,   output wire ex_pc,
-  input wire if_inst, output wire ex_inst
+  input wire [31:0] if_pc,   output wire [31:0] ex_pc,
+  input wire [31:0] if_inst, output wire [31:0] ex_inst
 );
 
   pipeline _pipeline1_(

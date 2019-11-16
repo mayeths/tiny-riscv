@@ -3,31 +3,30 @@
 `include "../defines.sv";
 
 module decode (
-  input  logic[31:0] inst,
+  input  logic [31:0] inst,
 
   //normal instruction
-  output logic rs1_enable,
-  output logic rs2_enable,
-  output logic[4:0] rs1_addr,
-  output logic[4:0] rs2_addr,
-  output logic[3:0] alu_action,
-  output logic op1_is_pc,
-  output logic op2_is_imm,
-  output logic[31:0] imm32,
-  output logic dst_enable,
-  output logic[4:0] dst_addr,
-  output logic load_enable,
-  output logic store_enable,
-  output logic[2:0] load_type,
-  output logic[1:0] store_type,
+  output logic        rs1_enable,
+  output logic        rs2_enable,
+  output logic [4:0]  rs1_addr,
+  output logic [4:0]  rs2_addr,
+  output logic [3:0]  alu_action,
+  output logic        op1_is_pc,
+  output logic        op2_is_imm,
+  output logic [31:0] imm32,
+  output logic        dst_enable,
+  output logic [4:0]  dst_addr,
+  output logic        load_enable,
+  output logic        store_enable,
+  output logic [2:0]  load_type,
+  output logic [1:0]  store_type,
+  output logic [2:0]  exu_out_src,
   //csr instruction
-  output logic[11:0] csr_addr,
-  output logic csr_read_enable,
-  output logic csr_write_enable,
-  output logic[3:0] csru_action,
-  output logic[31:0] uimm32,
-  //detemine exu output result of alu, or csru (even mdu, or fpu)?
-  output logic[2:0] exu_out_src
+  output logic [11:0] csr_addr,
+  output logic        csr_read_enable,
+  output logic        csr_write_enable,
+  output logic [3:0]  csru_action,
+  output logic [31:0] uimm32
 );
 
   //TODO: please test these logic. All of them.

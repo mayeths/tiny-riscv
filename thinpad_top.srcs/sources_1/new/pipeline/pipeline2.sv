@@ -3,14 +3,14 @@ module pipeline2(
   input wire rst,
   input wire flush,
   input wire stall,
-  input wire exu_alu_out,      output wire lsu_alu_out,
-  input wire exu_load_enable,  output wire lsu_load_enable,
-  input wire exu_load_type,    output wire lsu_load_type,
-  input wire exu_store_enable, output wire lsu_store_enable,
-  input wire exu_store_type,   output wire lsu_store_type,
-  input wire exu_store_data,   output wire lsu_store_data,
-  input wire exu_dst_enable,   output wire lsu_dst_enable,
-  input wire exu_dst_addr,     output wire lsu_dst_addr
+  input wire [31:0] exu_alu_out,      output wire [31:0] lsu_alu_out,
+  input wire        exu_load_enable,  output wire        lsu_load_enable,
+  input wire        exu_store_enable, output wire        lsu_store_enable,
+  input wire [2:0]  exu_load_type,    output wire [2:0]  lsu_load_type,
+  input wire [1:0]  exu_store_type,   output wire [1:0]  lsu_store_type,
+  input wire [31:0] exu_store_data,   output wire [31:0] lsu_store_data,
+  input wire        exu_dst_enable,   output wire        lsu_dst_enable,
+  input wire [4:0]  exu_dst_addr,     output wire [4:0]  lsu_dst_addr
 );
 
   pipeline _pipeline2_(
@@ -24,7 +24,7 @@ module pipeline2(
       exu_store_data,
       exu_dst_enable,
       exu_dst_addr
-      }),
+    }),
     .out({
       lsu_alu_out,
       lsu_load_enable,

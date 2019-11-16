@@ -4,8 +4,9 @@
 
 module pipeline(
   input  wire clk, rst, flush, stall,
-  input  wire[1023:0] in,
-  output reg [1023:0] out
+  input  wire [1023:0] in,
+
+  output reg  [1023:0] out
 );
 
   always @(posedge clk)

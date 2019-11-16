@@ -1,9 +1,5 @@
 module core (
 
-  LFU_AXI
-
-  LSU_AXI
-
 );
 
   wire system_clk;

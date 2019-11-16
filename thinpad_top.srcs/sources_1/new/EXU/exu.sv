@@ -4,20 +4,20 @@
 // 届时，还需要一个Dispatch Unit.
 
 module exu(
-  input  logic[31:0] rs1,
-  input  logic[31:0] rs2,
-  input  logic[31:0] pc,
-  input  logic[31:0] imm32,
-  input  logic op1_is_pc,
-  input  logic op2_is_imm,
-  input  logic[3:0]  alu_action,
-  input  logic[31:0] csr,
-  input  logic[3:0]  csru_action,
-  input  logic[31:0] uimm32,
-  input  logic[2:0]  exu_out_src,
+  input  logic [31:0] rs1,
+  input  logic [31:0] rs2,
+  input  logic [31:0] pc,
+  input  logic [31:0] imm32,
+  input  logic        op1_is_pc,
+  input  logic        op2_is_imm,
+  input  logic [3:0]  alu_action,
+  input  logic [31:0] csr,
+  input  logic [3:0]  csru_action,
+  input  logic [31:0] uimm32,
+  input  logic [2:0]  exu_out_src,
 
-  output logic[31:0] exu_out,
-  output logic[31:0] csr_out
+  output logic [31:0] exu_out,
+  output logic [31:0] csr_out
 );
 
   logic [31:0] in1 = op1_is_pc  ? pc4   : rs1;

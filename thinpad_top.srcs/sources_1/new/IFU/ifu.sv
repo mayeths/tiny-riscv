@@ -1,24 +1,17 @@
 // IFU (Intruction Fetch Unit): 取指单元
 // Contains litebpu & minidecode submodule.
-`include "../defines.sv"
+`include "../defines.sv";
 
 module ifu(
+  input  wire clk,
+  input  wire rst,
+  input  wire stall,
+  input  wire bpfail,
+  input  wire [31:0] jalr_data,
 
-  //TODO: add AXI here
-  //make stall == 1 if AXI is busy
-  LFU_AXI
-  [31:0]axi_addr,
-  [31:0]axi_data,
-
-  input  logic clk,
-  input  logic rst,
-  input  logic stall,
-  input  logic bpfail,
   output reg  [31:0] pc,
-  output logic[31:0] inst,
-  //jalr's rd, from regfile
-  input  logic[4:0]  jalr_addr,
-  output logic[31:0] jalr_data
+  output wire [31:0] inst,
+  output wire [4:0]  jalr_addr
 );
 
   reg [31:0] branch_backup;

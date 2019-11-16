@@ -3,11 +3,11 @@ module csrfile(
   input  wire rst,
   input  wire read_enable,
   input  wire write_enable,
-  input  wire[4:0]  read_idx,
-  input  wire[4:0]  write_idx,
-  input  wire[31:0] write_data,
+  input  wire [4:0]  read_idx,
+  input  wire [4:0]  write_idx,
+  input  wire [31:0] write_data,
 
-  output wire[31:0] read_data
+  output wire [31:0] read_data
 
   //expose some essential csr here
 );
