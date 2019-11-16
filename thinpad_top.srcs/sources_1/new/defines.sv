@@ -70,8 +70,8 @@
 `define LW  3'b010
 `define LBU 3'b011
 `define LHU 3'b100
-`define SB  3'b101
-`define SH  3'b110
-`define SW  3'b111
+`define SB  2'b00
+`define SH  2'b01
+`define SW  2'b10
 
 `endif

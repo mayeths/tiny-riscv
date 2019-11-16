@@ -106,7 +106,7 @@ module decode (
   logic is_and  = belong_alui & func3_111;
   //fence
   logic is_fence  = belong_fence & func3_000;
-  logic is_fencei = belong_fence & func3_001
+  logic is_fencei = belong_fence & func3_001;
   //env
   logic is_ecall  = belong_csr & func3_000 & (rs2 == 5'b00000);
   logic is_ebreak = belong_csr & func3_000 & (rs2 == 5'b00001);
@@ -161,25 +161,25 @@ module decode (
   //bus.
   assign rs1_addr = is_lui ? 5'b00000 : rs1;
   assign rs2_addr = rs2;
-  assign imm32 =
-    Itype ? imm32_Itype :
-    Stype ? imm32_Stype :
-    Utype ? imm32_Utype :
-    Jtype ? imm32_Jtype :
-    32'b0;
+  assign imm32 = 32'b0
+    | ({32{Itype}} & imm32_Itype)
+    | ({32{Stype}} & imm32_Stype)
+    | ({32{Utype}} & imm32_Utype)
+    | ({32{Jtype}} & imm32_Jtype)
+    ;
   assign dst_addr = rd;
-  assign load_type =
-    is_lb  ? `LB  :
-    is_lh  ? `LH  :
-    is_lw  ? `LW  :
-    is_lbu ? `LBU :
-    is_lhu ? `LHU :
-    3'b0;
-  assign store_type =
-    is_sb  ? `SB  :
-    is_sh  ? `SH  :
-    is_sw  ? `SW  :
-    3'b0;
+  assign load_type = 3'b0
+    | ({3{is_lb }} & `LB )
+    | ({3{is_lh }} & `LH )
+    | ({3{is_lw }} & `LW )
+    | ({3{is_lbu}} & `LBU)
+    | ({3{is_lhu}} & `LHU)
+    ;
+  assign store_type = 3'b0
+    | ({2{is_sb}} & `SB)
+    | ({2{is_sh}} & `SH)
+    | ({2{is_sw}} & `SW)
+    ;
   //control signals.
   assign rs1_enable   = belong_branch | belong_load  | belong_store | belong_alui | belong_alur;
   assign rs2_enable   = belong_branch | belong_store | belong_alur;
@@ -188,43 +188,43 @@ module decode (
   assign store_enable = belong_store;
   assign op1_is_pc    = is_auipc | is_jal   | is_jalr;
   assign op2_is_imm   = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | belong_alui;
-  assign alu_action =
-    need_add  ? `ALU_ADD  :
-    need_sub  ? `ALU_SUB  :
-    need_and  ? `ALU_AND  :
-    need_or   ? `ALU_OR   :
-    need_xor  ? `ALU_XOR  :
-    need_sll  ? `ALU_SLL  :
-    need_srl  ? `ALU_SRL  :
-    need_sra  ? `ALU_SRA  :
-    need_slt  ? `ALU_SLT  :
-    need_sltu ? `ALU_SLTU :
-    4'b0;
+  assign alu_action = 4'b0
+    | ({4{need_add }} & `ALU_ADD )
+    | ({4{need_sub }} & `ALU_SUB )
+    | ({4{need_and }} & `ALU_AND )
+    | ({4{need_or  }} & `ALU_OR  )
+    | ({4{need_xor }} & `ALU_XOR )
+    | ({4{need_sll }} & `ALU_SLL )
+    | ({4{need_srl }} & `ALU_SRL )
+    | ({4{need_sra }} & `ALU_SRA )
+    | ({4{need_slt }} & `ALU_SLT )
+    | ({4{need_sltu}} & `ALU_SLTU)
+    ;
 
   //csr bus & constrol signals.
   //See p.54 Table 9.1 of riscv-spec.pdf to check csr_read_enable & csr_write_enable.
   assign csr_addr = inst[20:31];
   assign csr_read_enable  = ((is_csrrw | is_csrrwi) & (rd != 5'b00000)) | is_csrrs | is_csrrsi | is_csrrc | is_csrrci;
   assign csr_write_enable = is_csrrw | is_csrrwi | ((is_csrrs | is_csrrsi | is_csrrc | is_csrrci) & (rs1 != 5'b00000));
-  assign csru_action =
-    is_ecall  ? `CSR_ECALL  :
-    is_ebreak ? `CSR_EBREAK :
-    is_csrrw  ? `CSR_CSRRW  :
-    is_csrrs  ? `CSR_CSRRS  :
-    is_csrrc  ? `CSR_CSRRC  :
-    is_csrrwi ? `CSR_CSRRWI :
-    is_csrrsi ? `CSR_CSRRSI :
-    is_csrrci ? `CSR_CSRRCI :
-    3'b0;
+  assign csru_action = 3'b0
+    | ({3{is_ecall }} & `CSR_ECALL )
+    | ({3{is_ebreak}} & `CSR_EBREAK)
+    | ({3{is_csrrw }} & `CSR_CSRRW )
+    | ({3{is_csrrs }} & `CSR_CSRRS )
+    | ({3{is_csrrc }} & `CSR_CSRRC )
+    | ({3{is_csrrwi}} & `CSR_CSRRWI)
+    | ({3{is_csrrsi}} & `CSR_CSRRSI)
+    | ({3{is_csrrci}} & `CSR_CSRRCI)
+    ;
   assign uimm32 = {27'b0, inst[19:15]};
 
   assign exu_out_src = belong_csr ? `OUTPUT_CSRU : `OUTPUT_ALU;
   //Use the following exu_out_src if we add MDU & FPU
-  //assign exu_out_src =
-  //  belong_csr ? `OUTPUT_CSRU :
-  //  belong_md  ? `OUTPUT_MDU  :
-  //  belong_fp  ? `OUTPUT_FPU  :
-  //  `OUTPUT_ALU;
+  // assign exu_out_src = `OUTPUT_ALU
+  //   | ({2{belong_csr}} & `OUTPUT_CSRU)
+  //   | ({2{belong_md }} & `OUTPUT_MDU )
+  //   | ({2{belong_fp }} & `OUTPUT_FPU )
+  //   ;
 
 
 endmodule
