@@ -204,14 +204,14 @@ module decode (
   assign csr_read_enable  = ((is_csrrw | is_csrrwi) & (rd != 5'b00000)) | is_csrrs | is_csrrsi | is_csrrc | is_csrrci;
   assign csr_write_enable = is_csrrw | is_csrrwi | ((is_csrrs | is_csrrsi | is_csrrc | is_csrrci) & (rs1 != 5'b00000));
   assign csru_action = 3'b0
-    | ({3{is_ecall }} & `CSR_ECALL )
-    | ({3{is_ebreak}} & `CSR_EBREAK)
-    | ({3{is_csrrw }} & `CSR_CSRRW )
-    | ({3{is_csrrs }} & `CSR_CSRRS )
-    | ({3{is_csrrc }} & `CSR_CSRRC )
-    | ({3{is_csrrwi}} & `CSR_CSRRWI)
-    | ({3{is_csrrsi}} & `CSR_CSRRSI)
-    | ({3{is_csrrci}} & `CSR_CSRRCI)
+    | ({3{is_ecall }} & `CSRU_ECALL )
+    | ({3{is_ebreak}} & `CSRU_EBREAK)
+    | ({3{is_csrrw }} & `CSRU_CSRRW )
+    | ({3{is_csrrs }} & `CSRU_CSRRS )
+    | ({3{is_csrrc }} & `CSRU_CSRRC )
+    | ({3{is_csrrwi}} & `CSRU_CSRRWI)
+    | ({3{is_csrrsi}} & `CSRU_CSRRSI)
+    | ({3{is_csrrci}} & `CSRU_CSRRCI)
     ;
   assign uimm32 = {27'b0, inst[19:15]};
 

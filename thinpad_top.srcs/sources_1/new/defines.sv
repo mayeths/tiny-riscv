@@ -45,14 +45,14 @@
 /**********************
  * CSRU action.
  *********************/
-`define CSR_ECALL  3'b000
-`define CSR_EBREAK 3'b001
-`define CSR_CSRRW  3'b010
-`define CSR_CSRRS  3'b011
-`define CSR_CSRRC  3'b100
-`define CSR_CSRRWI 3'b101
-`define CSR_CSRRSI 3'b110
-`define CSR_CSRRCI 3'b111
+`define CSRU_ECALL  3'b000
+`define CSRU_EBREAK 3'b001
+`define CSRU_CSRRW  3'b010
+`define CSRU_CSRRS  3'b011
+`define CSRU_CSRRC  3'b100
+`define CSRU_CSRRWI 3'b101
+`define CSRU_CSRRSI 3'b110
+`define CSRU_CSRRCI 3'b111
 
 /**********************
  * EXU OUTPUT.
