@@ -11,8 +11,8 @@ module exu(
   input  logic        op1_is_pc,
   input  logic        op2_is_imm,
   input  logic [3:0]  alu_action,
+  input  logic [2:0]  csru_action,
   input  logic [31:0] csr,
-  input  logic [3:0]  csru_action,
   input  logic [31:0] uimm32,
   input  logic [2:0]  exu_out_src,
 

@@ -6,10 +6,11 @@ module core (
   wire system_rst;
 
   ////////output of modules////////
+  // Then what you need is assign them to next corresponding modules.
   ////        ifu
   wire [31:0] ifu_pc;
   wire [31:0] ifu_inst;
-  wire        ifu_jalr_addr;
+  wire [4:0]  ifu_jalr_addr;
   ////        pipeline1
   wire [31:0] pipe1_pc;
   wire [31:0] pipe1_inst;
@@ -28,12 +29,12 @@ module core (
   wire        decode_store_enable;
   wire [2:0]  decode_load_type;
   wire [1:0]  decode_store_type;
+  wire [1:0]  decode_exu_out_src;
   wire [11:0] decode_csr_addr;
   wire        decode_csr_read_enable;
   wire        decode_csr_write_enable;
-  wire [3:0]  decode_csru_action;
+  wire [2:0]  decode_csru_action;
   wire [31:0] decode_uimm32;
-  wire [2:0]  decode_exu_out_src;
   ////        regfile
   wire [31:0] regfile_rs1_data;
   wire [31:0] regfile_rs2_data;
@@ -101,12 +102,12 @@ module core (
     .store_enable    (decode_store_enable),
     .load_type       (decode_load_type),
     .store_type      (decode_store_type),
+    .exu_out_src     (decode_exu_out_src),
     .csr_addr        (decode_csr_addr),
     .csr_read_enable (decode_csr_read_enable),
     .csr_write_enable(decode_csr_write_enable),
     .csru_action     (decode_csru_action),
-    .uimm32          (decode_uimm32),
-    .exu_out_src     (decode_exu_out_src)
+    .uimm32          (decode_uimm32)
   );
 
   regfile regfile_(
@@ -147,8 +148,8 @@ module core (
     .op1_is_pc  (),
     .op2_is_imm (),
     .alu_action (),
-    .csr        (),
     .csru_action(),
+    .csr        (),
     .uimm32     (),
     .exu_out_src(),
     //output
@@ -176,8 +177,8 @@ module core (
     .stall(),
     .exu_alu_out     (),            .lsu_alu_out     (pipe2_alu_out),
     .exu_load_enable (),            .lsu_load_enable (pipe2_load_enable),
-    .exu_load_type   (),            .lsu_load_type   (pipe2_load_type),
     .exu_store_enable(),            .lsu_store_enable(pipe2_store_enable),
+    .exu_load_type   (),            .lsu_load_type   (pipe2_load_type),
     .exu_store_type  (),            .lsu_store_type  (pipe2_store_type),
     .exu_store_data  (),            .lsu_store_data  (pipe2_store_data),
     .exu_dst_enable  (),            .lsu_dst_enable  (pipe2_dst_enable),

@@ -20,12 +20,12 @@ module decode (
   output logic        store_enable,
   output logic [2:0]  load_type,
   output logic [1:0]  store_type,
-  output logic [2:0]  exu_out_src,
+  output logic [1:0]  exu_out_src,
   //csr instruction
   output logic [11:0] csr_addr,
   output logic        csr_read_enable,
   output logic        csr_write_enable,
-  output logic [3:0]  csru_action,
+  output logic [2:0]  csru_action,
   output logic [31:0] uimm32
 );
 

@@ -3,8 +3,8 @@ module csrfile(
   input  wire rst,
   input  wire read_enable,
   input  wire write_enable,
-  input  wire [4:0]  read_idx,
-  input  wire [4:0]  write_idx,
+  input  wire [11:0] read_idx,
+  input  wire [11:0] write_idx,
   input  wire [31:0] write_data,
 
   output wire [31:0] read_data
