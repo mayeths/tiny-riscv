@@ -20,8 +20,8 @@ module exu(
   output logic [31:0] csr_out
 );
 
-  logic [31:0] in1 = op1_is_pc  ? pc4   : rs1;
-  logic [31:0] in2 = op2_is_imm ? imm32 : rs1;
+  logic [31:0] in1 = op1_is_pc  ? pc    : rs1;
+  logic [31:0] in2 = op2_is_imm ? imm32 : rs2;
 
   logic [31:0] alu_out;
   logic [31:0] csru_out;
