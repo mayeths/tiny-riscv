@@ -74,4 +74,6 @@
 `define SH  2'b01
 `define SW  2'b10
 
+`define INST_NOP 32'b0110011
+
 `endif
