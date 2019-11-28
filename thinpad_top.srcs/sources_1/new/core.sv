@@ -10,7 +10,11 @@ module core (
   ////        ifu
   wire [31:0] ifu_pc;
   wire [31:0] ifu_inst;
+  wire [31:0] ifu_sram_addr;
   wire [4:0]  ifu_jalr_addr;
+  // wire exception_addr_misalign_inst;
+  // wire exception_access_fault_inst;
+  // wire exception_page_fault_ins;
   ////        pipeline1
   wire [31:0] pipe1_pc;
   wire [31:0] pipe1_inst;
@@ -39,13 +43,13 @@ module core (
   wire [31:0] regfile_rs1_data;
   wire [31:0] regfile_rs2_data;
   wire [31:0] regfile_jalr_data;
-  ////        csrfile
-  wire [31:0] csrfile_read_data;
   ////        exu
   wire [31:0] exu_exu_out;
   wire [31:0] exu_csr_out;
-  ////        bpru
-  wire        bpru_bpfail;
+  ////        bru
+  wire        go_branch;
+  wire [31:0] go_branch_op1;
+  wire [31:0] go_branch_op2;
   ////        pipeline2
   wire [31:0] pipe2_alu_out;
   wire        pipe2_load_enable;
@@ -59,7 +63,8 @@ module core (
   wire        lsu_stall;
   wire        lsu_load_data_valid;
   wire [31:0] lsu_load_data;
-  ////        misc wires
+  ////        computed wires
+  wire pipeline1_flush = go_branch | go_trap | from_trap;
 
 
   IFU ifu_(
@@ -67,18 +72,36 @@ module core (
     .clk      (system_clk),
     .rst      (system_rst),
     .stall    (),
-    .bpfail   (),
-    .jalr_data(),
     //output
-    .pc       (ifu_pc),
-    .inst     (ifu_inst),
-    .jalr_addr(ifu_jalr_addr)
+    .pc  (ifu_pc),
+    .inst(ifu_inst),
+    //assign to BIU
+    .sram_valid(),
+    .sram_data (),
+    .sram_addr (ifu_sram_addr),
+    //assign to regfile
+    .jalr_data(),
+    .jalr_addr(ifu_jalr_addr),
+    //assign to BRU
+    .go_branch(),
+    .go_branch_op1(),
+    .go_branch_op2()
+    //assign to CSRHub
+    // .go_trap      (),
+    // .go_trap_op1  (),
+    // .go_trap_op2  (),
+    // .from_trap    (),
+    // .from_trap_op1(),
+    // .from_trap_op2(),
+    // .exception_addr_misalign_inst(exception_addr_misalign_inst),
+    // .exception_access_fault_inst (exception_access_fault_inst),
+    // .exception_page_fault_inst   (exception_page_fault_inst)
   );
 
   pipeline1 pipeline1_(
     .clk    (system_clk),
     .rst    (system_rst),
-    .flush  (),
+    .flush  (pipeline1_flush),
     .stall  (),
     .if_pc  (),              .ex_pc  (pipe1_pc),
     .if_inst(),              .ex_inst(pipe1_inst)
@@ -126,17 +149,21 @@ module core (
     .jalr_data(regfile_jalr_data)
   );
 
-  csrfile csrfile_(
+  BRU bru_(
     //input
-    .clk         (system_clk),
-    .rst         (system_rst),
-    .read_enable (),
-    .write_enable(),
-    .read_idx    (),
-    .write_idx   (),
-    .write_data  (),
+    .pc(),
+    .inst(),
+    .is_beq (),
+    .is_bne (),
+    .is_blt (),
+    .is_bge (),
+    .is_bltu(),
+    .is_bgeu(),
+    .alu_out(),
     //output
-    .read_data(csrfile_read_data)
+    .go_branch(),
+    .go_branch_op1(),
+    .go_branch_op2()
   );
 
   exu exu_(
@@ -155,19 +182,6 @@ module core (
     //output
     .exu_out(exu_exu_out),
     .csr_out(exu_csr_out)
-  );
-
-  BPRU bpru_(
-    //input
-    .is_beq (),
-    .is_bne (),
-    .is_blt (),
-    .is_bge (),
-    .is_bltu(),
-    .is_bgeu(),
-    .alu_out(),
-    //output
-    .bpfail(bpru_bpfail)
   );
 
   pipeline2 pipepine2_(

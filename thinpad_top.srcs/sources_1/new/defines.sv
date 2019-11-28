@@ -25,7 +25,7 @@
 `define OP_ALUI   7'b0010011
 `define OP_ALUR   7'b0110011
 `define OP_FENCE  7'b0001111
-`define OP_CSR    7'b1110011
+`define OP_SYSTEM 7'b1110011
 `define OP_AMO    7'b0101111
 
 /**********************
@@ -73,6 +73,13 @@
 `define SB  2'b00
 `define SH  2'b01
 `define SW  2'b10
+
+/**********************
+ * Privilege Mode
+ *********************/
+`define MODE_M  2'b11
+`define MODE_S  2'b01
+`define MODE_U  2'b00
 
 `define INST_NOP 32'b0110011
 
