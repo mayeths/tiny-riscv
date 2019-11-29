@@ -22,17 +22,6 @@ module ifu(
   input  wire go_branch,
   input  wire [31:0] go_branch_op1,
   input  wire [31:0] go_branch_op2
-
-  // //Assign to CSRHub to learn whether trap occur
-  // input  wire go_trap,
-  // input  wire [31:0] go_trap_op1,
-  // input  wire [31:0] go_trap_op2,
-  // input  wire from_trap,
-  // input  wire [31:0] from_trap_op1,
-  // input  wire [31:0] from_trap_op2,
-  // output wire exception_addr_misalign_inst,
-  // output wire exception_access_fault_inst,
-  // output wire exception_page_fault_inst
 );
 
   // IFU遇到jal或jalr指令，直接在内部完成跳转
@@ -46,15 +35,11 @@ module ifu(
   ////// Bus
   // PC privilege: trap > branch > jal | jalr
   wire [31:0] pc_next_op1 =
-    // go_trap   ? go_trap_op1 :    // {mtvec[31:2], 2'b00} or {stvec...}, {utvec...}
-    // from_trap ? from_trap_op1 :  // mepc, sepc or uepc
     go_branch ? go_branch_op1 :  // pc of EX phase
     is_jal    ? pc :             // pc of IF phase
     is_jalr   ? jalr_data :      // rs1 of jalr instruction
     pc;                          // Normal
   wire [31:0] pc_next_op2 =
-    // go_trap   ? go_trap_op2 :    // e.g., 32'h0, 32'h4 or 32'h8...(determined by mtvec[1:0])
-    // from_trap ? from_trap_op2 :  // 32'b0
     go_branch ? go_branch_op2 :  // B-type imm32
     is_jal    ? immJal :         // J-type imm32
     is_jalr   ? immJalr :        // I-type imm32
@@ -64,9 +49,6 @@ module ifu(
   assign ibus_addr = pc_next;
   assign ibus_rd = 1'b1;
   assign jalr_addr = inst[11:7];
-  // assign exception_addr_misalign_inst = 1'b0;  //目前不考虑异常
-  // assign exception_access_fault_inst = 1'b0;
-  // assign exception_page_fault_inst = 1'b0;
 
   always @(posedge clk)begin
     //PC从特殊到一般

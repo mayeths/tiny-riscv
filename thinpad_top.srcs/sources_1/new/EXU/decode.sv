@@ -14,6 +14,12 @@ module decode (
   output wire        op1_is_pc,
   output wire        op2_is_imm,
   output wire [31:0] imm32,
+  output wire        is_beq,
+  output wire        is_bne,
+  output wire        is_blt,
+  output wire        is_bge,
+  output wire        is_bltu,
+  output wire        is_bgeu,
   output wire        dst_enable,
   output wire [4:0]  dst_addr,
   output wire        load_enable,
@@ -82,12 +88,12 @@ module decode (
   wire is_jal   = opcode == `OP_JAL;
   wire is_jalr  = opcode == `OP_JALR;
   //branch
-  wire is_beq  = belong_branch & funct3_000;
-  wire is_bne  = belong_branch & funct3_001;
-  wire is_blt  = belong_branch & funct3_100;
-  wire is_bge  = belong_branch & funct3_101;
-  wire is_bltu = belong_branch & funct3_110;
-  wire is_bgeu = belong_branch & funct3_111;
+  assign is_beq  = belong_branch & funct3_000;
+  assign is_bne  = belong_branch & funct3_001;
+  assign is_blt  = belong_branch & funct3_100;
+  assign is_bge  = belong_branch & funct3_101;
+  assign is_bltu = belong_branch & funct3_110;
+  assign is_bgeu = belong_branch & funct3_111;
   //load
   wire is_lb  = belong_load & funct3_000;
   wire is_lh  = belong_load & funct3_001;
@@ -219,7 +225,7 @@ module decode (
     | ({4{need_sltu}} & `ALU_SLTU)
     ;
   //exception signals.
-  assign illegal_inst = !(
+  assign illegal_inst = !(inst == 32'b0|
     is_lui    | is_auipc    | is_jal   | is_jalr   |
     is_beq    | is_bne      | is_blt   | is_bge    | is_bltu   | is_bgeu   |
     is_lb     | is_lh       | is_lw    | is_lbu    | is_lhu    |

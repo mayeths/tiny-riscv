@@ -21,17 +21,22 @@ module core (
 
   ////////output of modules////////
   // Then what you need is assign them to next corresponding modules.
+  ////        biu
+  wire        ibus_valid;
+  wire [31:0] ibus_data;
+  wire [31:0] ibus_addr;
+  wire        ibus_rd;
+  wire        dbus_rd;
+  wire        dbus_wr;
+  wire [31:0] dbus_addr;
+  wire [31:0] dbus_data_i;
+  wire [31:0] dbus_data_o;
+  wire [3:0]  dbus_be;
+  wire        dbus_valid;
   ////        ifu
   wire [31:0] ifu_pc;
   wire [31:0] ifu_inst;
   wire [4:0]  ifu_jalr_addr;
-  wire ibus_valid;
-  wire [31:0] ibus_data;
-  wire [31:0] ibus_addr;
-  wire ibus_rd;
-  // wire exception_addr_misalign_inst;
-  // wire exception_access_fault_inst;
-  // wire exception_page_fault_ins;
   ////        pipeline1
   wire [31:0] pipe1_pc;
   wire [31:0] pipe1_inst;
@@ -44,6 +49,12 @@ module core (
   wire        decode_op1_is_pc;
   wire        decode_op2_is_imm;
   wire [31:0] decode_imm32;
+  wire        decode_is_beq;
+  wire        decode_is_bne;
+  wire        decode_is_blt;
+  wire        decode_is_bge;
+  wire        decode_is_bltu;
+  wire        decode_is_bgeu;
   wire        decode_dst_enable;
   wire [4:0]  decode_dst_addr;
   wire        decode_load_enable;
@@ -64,9 +75,9 @@ module core (
   wire [31:0] exu_exu_out;
   wire [31:0] exu_csr_out;
   ////        bru
-  wire        go_branch;
-  wire [31:0] go_branch_op1;
-  wire [31:0] go_branch_op2;
+  wire        bru_go_branch;
+  wire [31:0] bru_go_branch_op1;
+  wire [31:0] bru_go_branch_op2;
   ////        pipeline2
   wire [31:0] pipe2_alu_out;
   wire        pipe2_load_enable;
@@ -77,194 +88,10 @@ module core (
   wire        pipe2_dst_enable;
   wire [4:0]  pipe2_dst_addr;
   ////        lsu
-  wire dbus_rd;
-  wire dbus_wr;
-  wire [31:0] dbus_addr;
-  wire [31:0] dbus_data_i;
-  wire [31:0] dbus_data_o;
-  wire [3:0] dbus_be;
-  wire dbus_valid;
-
+  wire [31:0] lsu_load_data;
+  ////        wbu
+  wire [31:0] wbu_wb_data;
   ////        computed wires
-  wire pipeline1_flush = go_branch; //  | go_trap | from_trap;
-
-
-  ifu ifu_(
-    //input
-    .clk      (system_clk),
-    .rst      (system_rst),
-    .stall    (),
-    //output
-    .pc  (ifu_pc),
-    .inst(ifu_inst),
-    //assign to BIU
-    .ibus_valid(ibus_valid),
-    .ibus_data_i(ibus_data),
-    .ibus_addr(ifu_sram_addr),
-    .ibus_rd(ibus_rd),
-    //assign to regfile
-    .jalr_data(),
-    .jalr_addr(ifu_jalr_addr),
-    //assign to BRU
-    .go_branch(),
-    .go_branch_op1(),
-    .go_branch_op2()
-    //assign to CSRHub
-    // .go_trap      (),
-    // .go_trap_op1  (),
-    // .go_trap_op2  (),
-    // .from_trap    (),
-    // .from_trap_op1(),
-    // .from_trap_op2(),
-    // .exception_addr_misalign_inst(exception_addr_misalign_inst),
-    // .exception_access_fault_inst (exception_access_fault_inst),
-    // .exception_page_fault_inst   (exception_page_fault_inst)
-  );
-
-  pipeline1 pipeline1_(
-    .clk    (system_clk),
-    .rst    (system_rst),
-    .flush  (pipeline1_flush),
-    .stall  (),
-    .if_pc  (),              .ex_pc  (pipe1_pc),
-    .if_inst(),              .ex_inst(pipe1_inst)
-  );
-
-  decode decode_(
-    //input
-    .inst(),
-    //output
-    .rs1_enable      (decode_rs1_enable),
-    .rs2_enable      (decode_rs2_enable),
-    .rs1_addr        (decode_rs1_addr),
-    .rs2_addr        (decode_rs2_enable),
-    .alu_action      (decode_alu_action),
-    .op1_is_pc       (decode_op1_is_pc),
-    .op2_is_imm      (decode_op2_is_imm),
-    .imm32           (decode_imm32),
-    .dst_enable      (decode_dst_enable),
-    .dst_addr        (decode_dst_addr),
-    .load_enable     (decode_load_enable),
-    .store_enable    (decode_store_enable),
-    .load_type       (decode_load_type),
-    .store_type      (decode_store_type),
-    .exu_out_src     (decode_exu_out_src),
-    .csr_addr        (decode_csr_addr),
-    .csr_read_enable (decode_csr_read_enable),
-    .csr_write_enable(decode_csr_write_enable),
-    .csru_action     (decode_csru_action),
-    .uimm32          (decode_uimm32)
-  );
-
-  regfile regfile_(
-    //input
-    .clk       (system_clk),
-    .rst       (system_rst),
-    .rs1_addr  (),
-    .rs2_addr  (),
-    .dst_addr  (),
-    .dst_enable(),
-    .dst_data  (),
-    .jalr_addr (),
-    //output
-    .rs1_data (regfile_rs1_data),
-    .rs2_data (regfile_rs2_data),
-    .jalr_data(regfile_jalr_data)
-  );
-
-  BRU bru_(
-    //input
-    .pc(),
-    .inst(),
-    .is_beq (),
-    .is_bne (),
-    .is_blt (),
-    .is_bge (),
-    .is_bltu(),
-    .is_bgeu(),
-    .alu_out(),
-    //output
-    .go_branch(),
-    .go_branch_op1(),
-    .go_branch_op2()
-  );
-
-  exu exu_(
-    //input
-    .rs1        (),
-    .rs2        (),
-    .pc         (),
-    .imm32      (),
-    .op1_is_pc  (),
-    .op2_is_imm (),
-    .alu_action (),
-    .csru_action(),
-    .csr        (),
-    .uimm32     (),
-    .exu_out_src(),
-    //output
-    .exu_out(exu_exu_out),
-    .csr_out(exu_csr_out)
-  );
-
-  pipeline2 pipepine2_(
-    .clk  (system_clk),
-    .rst  (system_rst),
-    .flush(),
-    .stall(),
-    .exu_alu_out     (),            .lsu_alu_out     (pipe2_alu_out),
-    .exu_load_enable (),            .lsu_load_enable (pipe2_load_enable),
-    .exu_store_enable(),            .lsu_store_enable(pipe2_store_enable),
-    .exu_load_type   (),            .lsu_load_type   (pipe2_load_type),
-    .exu_store_type  (),            .lsu_store_type  (pipe2_store_type),
-    .exu_store_data  (),            .lsu_store_data  (pipe2_store_data),
-    .exu_dst_enable  (),            .lsu_dst_enable  (pipe2_dst_enable),
-    .exu_dst_addr    (),            .lsu_dst_addr    (pipe2_dst_addr)
-  );
-
-  // lsu lsu_(
-  //   //input
-  //   .clk         (system_clk),
-  //   .rst         (system_rst),
-  //   .load_enable (),
-  //   .load_type   (),
-  //   .store_enable(),
-  //   .store_type  (),
-  //   .addr        (),
-  //   .store_data  (),
-  //   //output
-  //   .stall          (lsu_stall),
-  //   .load_data_valid(lsu_load_data_valid),
-  //   .load_data      (lsu_load_data)
-  // );
-
-  lsu lsu_(
-  	.clk             (system_clk),
-    .rst             (system_rst),
-    .load_enable     (pipe2_load_enable),
-    .load_type       (pipe2_store_enable),
-    .store_enable    (pipe2_load_type),
-    .store_type      (pipe2_store_type),
-    .addr            (pipe2_dst_addr),
-    .store_data      (pipe2_store_data),
-
-    .stall           (stall           ),
-    .load_data_valid (load_data_valid ),
-    .load_data       (load_data       ),
-    .dbus_rd         (dbus_rd         ),
-    .dbus_wr         (dbus_wr         ),
-    .dbus_addr       (dbus_addr       ),
-    .dbus_data_i     (dbus_data_i     ),
-    .dbus_data_o     (dbus_data_o     ),
-    .dbus_be         (dbus_be         ),
-    .dbus_valid      (dbus_valid      )
-  );
-
-  // TODO: write back to regfile
-  // assign regfile.dst_enable <- pipeline2.lsu_dst_enalbe
-  // assign regfile.dst_addr   <- pipeline2.lsu_dst_addr
-  // assign regfile.dst_data   <- pipeline2.lsu_load_enable & lsu.load_data_valid ?
-  //                              (lsu.load_data : pipeline2.lsu_alu_out)
 
   biu u_biu(
   	.ibus_addr     (ibus_addr     ),
@@ -291,7 +118,168 @@ module core (
     .ext_ram_oe_n  (ext_ram_oe_n  ),
     .ext_ram_we_n  (ext_ram_we_n  )
   );
-  
+
+
+  ifu ifu_(
+    //input
+    .clk      (system_clk),
+    .rst      (system_rst),
+    .stall    (),
+    //output
+    .pc  (ifu_pc),
+    .inst(ifu_inst),
+    //assign to BIU
+    .ibus_valid (ibus_valid),
+    .ibus_data_i(ibus_data),
+    .ibus_addr  (ibus_addr),
+    .ibus_rd    (ibus_rd),
+    //assign to regfile
+    .jalr_data(regfile_jalr_data),
+    .jalr_addr(ifu_jalr_addr),
+    //assign to BRU
+    .go_branch    (bru_go_branch),
+    .go_branch_op1(bru_go_branch_op1),
+    .go_branch_op2(bru_go_branch_op2)
+  );
+
+  pipeline1 pipeline1_(
+    .clk    (system_clk),
+    .rst    (system_rst),
+    .flush  (go_branch),
+    .stall  (),
+    .if_pc  (ifu_pc),             .ex_pc  (pipe1_pc),
+    .if_inst(ifu_inst),           .ex_inst(pipe1_inst)
+  );
+
+  decode decode_(
+    //input
+    .inst(pipe1_inst),
+    //output
+    .rs1_enable      (decode_rs1_enable),
+    .rs2_enable      (decode_rs2_enable),
+    .rs1_addr        (decode_rs1_addr),
+    .rs2_addr        (decode_rs2_addr),
+    .alu_action      (decode_alu_action),
+    .op1_is_pc       (decode_op1_is_pc),
+    .op2_is_imm      (decode_op2_is_imm),
+    .imm32           (decode_imm32),
+    .is_beq          (decode_is_beq),
+    .is_bne          (decode_is_bne),
+    .is_blt          (decode_is_blt),
+    .is_bge          (decode_is_bge),
+    .is_bltu         (decode_is_bltu),
+    .is_bgeu         (decode_is_bgeu),
+    .dst_enable      (decode_dst_enable),
+    .dst_addr        (decode_dst_addr),
+    .load_enable     (decode_load_enable),
+    .store_enable    (decode_store_enable),
+    .load_type       (decode_load_type),
+    .store_type      (decode_store_type),
+    .exu_out_src     (decode_exu_out_src),
+    .csr_addr        (decode_csr_addr),
+    .csr_read_enable (decode_csr_read_enable),
+    .csr_write_enable(decode_csr_write_enable),
+    .csru_action     (decode_csru_action),
+    .uimm32          (decode_uimm32)
+  );
+
+  regfile regfile_(
+    //input
+    .clk       (system_clk),
+    .rst       (system_rst),
+    .rs1_addr  (decode_rs1_addr),
+    .rs2_addr  (decode_rs2_addr),
+    .dst_addr  (pipe2_dst_addr),
+    .dst_enable(pipe2_dst_enable),
+    .dst_data  (wbu_wb_data),
+    .jalr_addr (ifu_jalr_addr),
+    //output
+    .rs1_data (regfile_rs1_data),
+    .rs2_data (regfile_rs2_data),
+    .jalr_data(regfile_jalr_data)
+  );
+
+  BRU bru_(
+    //input
+    .pc(pipe1_pc),
+    .inst(pipe1_inst),
+    .is_beq (decode_is_beq),
+    .is_bne (decode_is_bne),
+    .is_blt (decode_is_blt),
+    .is_bge (decode_is_bge),
+    .is_bltu(decode_is_bltu),
+    .is_bgeu(decode_is_bgeu),
+    .alu_out(exu_exu_out),
+    //output
+    .go_branch(bru_go_branch),
+    .go_branch_op1(bru_go_branch_op1),
+    .go_branch_op2(bru_go_branch_op2)
+  );
+
+  exu exu_(
+    //input
+    .rs1        (regfile_rs1_data),
+    .rs2        (regfile_rs2_data),
+    .pc         (pipe1_pc),
+    .imm32      (decode_imm32),
+    .op1_is_pc  (decode_op1_is_pc),
+    .op2_is_imm (decode_op2_is_imm),
+    .alu_action (decode_alu_action),
+    .csru_action(decode_csru_action),
+    .csr        (),
+    .uimm32     (decode_uimm32),
+    .exu_out_src(decode_exu_out_src),
+    //output
+    .exu_out(exu_exu_out),
+    .csr_out(exu_csr_out)
+  );
+
+  pipeline2 pipepine2_(
+    .clk  (system_clk),
+    .rst  (system_rst),
+    .flush(),
+    .stall(),
+    .exu_alu_out     (exu_exu_out),            .lsu_alu_out     (pipe2_alu_out),
+    .exu_load_enable (decode_load_enable),     .lsu_load_enable (pipe2_load_enable),
+    .exu_store_enable(decode_store_enable),    .lsu_store_enable(pipe2_store_enable),
+    .exu_load_type   (decode_load_type),       .lsu_load_type   (pipe2_load_type),
+    .exu_store_type  (decode_store_type),      .lsu_store_type  (pipe2_store_type),
+    .exu_store_data  (regfile_rs2_data),       .lsu_store_data  (pipe2_store_data),
+    .exu_dst_enable  (decode_dst_enable),      .lsu_dst_enable  (pipe2_dst_enable),
+    .exu_dst_addr    (decode_dst_addr),        .lsu_dst_addr    (pipe2_dst_addr)
+  );
+
+  lsu lsu_(
+    //input
+    .clk             (system_clk),
+    .rst             (system_rst),
+    .load_enable     (pipe2_load_enable),
+    .load_type       (pipe2_store_enable),
+    .store_enable    (pipe2_load_type),
+    .store_type      (pipe2_store_type),
+    .addr            (pipe2_dst_addr),
+    .store_data      (pipe2_store_data),
+    //output
+    .load_data       (load_data       ),
+    //assign to BIU
+    .dbus_rd         (dbus_rd         ),
+    .dbus_wr         (dbus_wr         ),
+    .dbus_addr       (dbus_addr       ),
+    .dbus_data_i     (dbus_data_i     ),
+    .dbus_data_o     (dbus_data_o     ),
+    .dbus_be         (dbus_be         ),
+    .dbus_valid      (dbus_valid      )
+  );
+
+  wbu wbu_(
+    //input
+  	.load_enable(pipe2_load_enable),
+    .load_data  (lsu_load_data),
+    .alu_out    (pipe2_alu_out),
+    //output
+    .wb_data(wbu_wb_data)
+  );
+
 
 endmodule
 

@@ -11,9 +11,7 @@ module lsu(
   input wire [31:0] addr,
   input wire [31:0] store_data,
   //output
-  input wire stall,
-  input wire load_data_valid,
-  input wire [31:0] load_data,
+  output wire [31:0] load_data,
 
   //Assign to BIU
   output wire dbus_rd,
@@ -87,6 +85,5 @@ module lsu(
     {32{load_type == `LH || load_type == `LHU}} & load_half_out |
     {32{load_type == `LW                     }} & load_word_out ;
   assign dbus_be = store_abcd;
-  assign load_data_valid = load_enable & dbus_valid;
 
 endmodule
