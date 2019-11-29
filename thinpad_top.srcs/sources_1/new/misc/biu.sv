@@ -88,7 +88,7 @@ assign baseram_en =
     (bus_addr <= `ADDR_BASERAM_END);
 
 assign base_ram_ce_n = ~baseram_en;
-assign base_ram_addr = bus_addr & `ADDR_BASERAM_MASK;
+assign base_ram_addr = (bus_addr & `ADDR_BASERAM_MASK) >> 2;
 assign base_ram_be_n = ~bus_be;
 assign base_ram_oe_n = ~bus_rd;
 assign base_ram_we_n = ~bus_wr;
@@ -99,7 +99,7 @@ assign extram_en =
     (bus_addr <= `ADDR_EXTRAM_END);
 
 assign base_ram_ce_n = ~extram_en;
-assign ext_ram_addr = bus_addr & `ADDR_EXTRAM_MASK;
+assign ext_ram_addr = (bus_addr & `ADDR_EXTRAM_MASK) >> 2;
 assign ext_ram_be_n = ~bus_be;
 assign ext_ram_oe_n = ~bus_rd;
 assign ext_ram_we_n = ~bus_wr;
