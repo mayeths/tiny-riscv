@@ -50,7 +50,7 @@ logic bus_valid;    // Slave -> Master
 
 // ====== ibus/dbus -> system bus ====== //
 assign bus_data_o = 
-    dbus_wr ? dbus_data_i ：
+    dbus_wr ? dbus_data_i :
     // ibus_wr ? ibus_data_i :      // ibus is readonly
     32'b0;
 
@@ -61,7 +61,7 @@ assign bus_addr =
 
 // assign bus_en = dbus_en | ibus_en;
 assign bus_rd = dbus_rd | ibus_rd;
-assign bus_wr = dbus_wr | ibus_wr;
+assign bus_wr = dbus_wr; // | ibus_wr;
 assign bus_be = dbus_be;
 
 assign ibus_valid = bus_valid & ~(dbus_rd | dbus_wr) & ibus_rd;
