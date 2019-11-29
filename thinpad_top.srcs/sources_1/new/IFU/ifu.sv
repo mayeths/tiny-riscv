@@ -9,10 +9,10 @@ module ifu(
   output reg  [31:0] inst,
 
   //Assign to system bus
-  input  wire ibus_valid,
-  input  wire [31:0] ibus_data_i,
-  output wire [31:0] ibus_addr,
-  output wire ibus_rd,
+  output wire        data_req,
+  input  wire        data_rvalid,
+  output wire [31:0] data_addr,
+  input  wire [31:0] data_rdata,
 
   //Assign to regfile to get jalr target address.
   input  wire [31:0] jalr_data,
@@ -46,17 +46,17 @@ module ifu(
     32'h4;                       // Normal
   wire [31:0] pc_next = pc_next_op1 + pc_next_op2;
 
-  assign ibus_addr = pc_next;
-  assign ibus_rd = 1'b1;
   assign jalr_addr = inst[11:7];
+  assign data_req = 1'b1;
+  assign data_addr = pc_next;
 
   always @(posedge clk)begin
     //PC从特殊到一般
     pc <=
       rst   ? 32'h8000_0000 :
-      stall | !ibus_valid ? pc :
+      !data_rvalid ? pc :
       pc_next;
-    inst <= ibus_valid ? ibus_data_i : `INST_NOP;
+    inst <= data_rvalid ? data_rdata : `INST_NOP;
   end
 
 endmodule
