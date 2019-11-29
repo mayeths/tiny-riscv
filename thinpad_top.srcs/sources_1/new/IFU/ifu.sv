@@ -8,10 +8,11 @@ module ifu(
   output reg  [31:0] pc,
   output reg  [31:0] inst,
 
-  //Assign to BIU to fetch instruction from sram.
-  input  wire sram_valid,
-  input  wire [31:0] sram_data,
-  output wire [31:0] sram_addr,
+  //Assign to system bus
+  input  wire ibus_valid,
+  input  wire [31:0] ibus_data_i,
+  output wire [31:0] ibus_addr,
+  output wire ibus_rd,
 
   //Assign to regfile to get jalr target address.
   input  wire [31:0] jalr_data,
@@ -60,7 +61,8 @@ module ifu(
     32'h4;                       // Normal
   wire [31:0] pc_next = pc_next_op1 + pc_next_op2;
 
-  assign sram_addr = pc_next;
+  assign ibus_addr = pc_next;
+  assign ibus_rd = 1'b1;
   assign jalr_addr = inst[11:7];
   // assign exception_addr_misalign_inst = 1'b0;  //目前不考虑异常
   // assign exception_access_fault_inst = 1'b0;
@@ -70,9 +72,9 @@ module ifu(
     //PC从特殊到一般
     pc <=
       rst   ? 32'b0 :
-      stall | !sram_valid ? pc :
+      stall | !ibus_valid ? pc :
       pc_next;
-    inst <= sram_valid ? sram_data : `INST_NOP;
+    inst <= ibus_valid ? ibus_data_i : `INST_NOP;
   end
 
 endmodule

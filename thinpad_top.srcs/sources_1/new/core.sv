@@ -1,5 +1,22 @@
 module core (
+  input wire system_clk,
+  input wire system_rst,
 
+  // BaseRAM信号
+  inout wire [31:0] base_ram_data,  //BaseRAM数据，低8位与CPLD串口控制器共享
+  output wire [19:0] base_ram_addr, //BaseRAM地址
+  output wire [3:0] base_ram_be_n,  //BaseRAM字节使能，低有效。如果不使用字节使能，请保持为0
+  output wire base_ram_ce_n,       //BaseRAM片选，低有效
+  output wire base_ram_oe_n,       //BaseRAM读使能，低有效
+  output wire base_ram_we_n,       //BaseRAM写使能，低有效
+
+  // ExtRAM信号
+  inout wire [31:0] ext_ram_data,  //ExtRAM数据
+  output wire [19:0] ext_ram_addr, //ExtRAM地址
+  output wire [3:0] ext_ram_be_n,  //ExtRAM字节使能，低有效。如果不使用字节使能，请保持为0
+  output wire ext_ram_ce_n,       //ExtRAM片选，低有效
+  output wire ext_ram_oe_n,       //ExtRAM读使能，低有效
+  output wire ext_ram_we_n       //ExtRAM写使能，低有效
 );
 
   wire system_clk;
@@ -10,8 +27,11 @@ module core (
   ////        ifu
   wire [31:0] ifu_pc;
   wire [31:0] ifu_inst;
-  wire [31:0] ifu_sram_addr;
   wire [4:0]  ifu_jalr_addr;
+  wire ibus_valid;
+  wire [31:0] ibus_data;
+  wire [31:0] ibus_addr;
+  wire ibus_rd;
   // wire exception_addr_misalign_inst;
   // wire exception_access_fault_inst;
   // wire exception_page_fault_ins;
@@ -76,9 +96,10 @@ module core (
     .pc  (ifu_pc),
     .inst(ifu_inst),
     //assign to BIU
-    .sram_valid(),
-    .sram_data (),
-    .sram_addr (ifu_sram_addr),
+    .ibus_valid(ibus_valid),
+    .ibus_data_i(ibus_data),
+    .ibus_addr(ifu_sram_addr),
+    .ibus_rd(ibus_rd),
     //assign to regfile
     .jalr_data(),
     .jalr_addr(ifu_jalr_addr),
@@ -220,6 +241,33 @@ module core (
   // assign regfile.dst_addr   <- pipeline2.lsu_dst_addr
   // assign regfile.dst_data   <- pipeline2.lsu_load_enable & lsu.load_data_valid ?
   //                              (lsu.load_data : pipeline2.lsu_alu_out)
+
+  biu u_biu(
+  	.ibus_addr     (ibus_addr     ),
+    .ibus_data_o   (ibus_data     ),
+    .ibus_rd       (ibus_rd       ),
+    .ibus_valid    (ibus_valid    ),
+    .dbus_rd       (dbus_rd       ),
+    .dbus_wr       (dbus_wr       ),
+    .dbus_addr     (dbus_addr     ),
+    .dbus_data_i   (dbus_data_i   ),
+    .dbus_data_o   (dbus_data_o   ),
+    .dbus_be       (dbus_be       ),
+    .dbus_valid    (dbus_valid    ),
+    .base_ram_data (base_ram_data ),
+    .base_ram_addr (base_ram_addr ),
+    .base_ram_be_n (base_ram_be_n ),
+    .base_ram_ce_n (base_ram_ce_n ),
+    .base_ram_oe_n (base_ram_oe_n ),
+    .base_ram_we_n (base_ram_we_n ),
+    .ext_ram_data  (ext_ram_data  ),
+    .ext_ram_addr  (ext_ram_addr  ),
+    .ext_ram_be_n  (ext_ram_be_n  ),
+    .ext_ram_ce_n  (ext_ram_ce_n  ),
+    .ext_ram_oe_n  (ext_ram_oe_n  ),
+    .ext_ram_we_n  (ext_ram_we_n  )
+  );
+  
 
 endmodule
 
