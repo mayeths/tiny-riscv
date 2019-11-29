@@ -81,11 +81,11 @@ thinpad_top dut(
     .dpy0(dpy0),
     .txd(txd),
     .rxd(rxd),
-    .uart_rdn(uart_rdn),
-    .uart_wrn(uart_wrn),
-    .uart_dataready(uart_dataready),
-    .uart_tbre(uart_tbre),
-    .uart_tsre(uart_tsre),
+    // .uart_rdn(uart_rdn),
+    // .uart_wrn(uart_wrn),
+    // .uart_dataready(uart_dataready),
+    // .uart_tbre(uart_tbre),
+    // .uart_tsre(uart_tsre),
     .base_ram_data(base_ram_data),
     .base_ram_addr(base_ram_addr),
     .base_ram_ce_n(base_ram_ce_n),
@@ -112,16 +112,16 @@ clock osc(
     .clk_11M0592(clk_11M0592),
     .clk_50M    (clk_50M)
 );
-// CPLD 串口仿真模型
-cpld_model cpld(
-    .clk_uart(clk_11M0592),
-    .uart_rdn(uart_rdn),
-    .uart_wrn(uart_wrn),
-    .uart_dataready(uart_dataready),
-    .uart_tbre(uart_tbre),
-    .uart_tsre(uart_tsre),
-    .data(base_ram_data[7:0])
-);
+// // CPLD 串口仿真模型
+// cpld_model cpld(
+//     .clk_uart(clk_11M0592),
+//     .uart_rdn(uart_rdn),
+//     .uart_wrn(uart_wrn),
+//     .uart_dataready(uart_dataready),
+//     .uart_tbre(uart_tbre),
+//     .uart_tsre(uart_tsre),
+//     .data(base_ram_data[7:0])
+// );
 // BaseRAM 仿真模型
 sram_model base1(/*autoinst*/
             .DataIO(base_ram_data[15:0]),

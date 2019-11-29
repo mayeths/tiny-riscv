@@ -71,7 +71,7 @@ module ifu(
   always @(posedge clk)begin
     //PC从特殊到一般
     pc <=
-      rst   ? 32'b0 :
+      rst   ? 32'h8000_0000 :
       stall | !ibus_valid ? pc :
       pc_next;
     inst <= ibus_valid ? ibus_data_i : `INST_NOP;

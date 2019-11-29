@@ -77,9 +77,14 @@ module core (
   wire        pipe2_dst_enable;
   wire [4:0]  pipe2_dst_addr;
   ////        lsu
-  wire        lsu_stall;
-  wire        lsu_load_data_valid;
-  wire [31:0] lsu_load_data;
+  wire dbus_rd;
+  wire dbus_wr;
+  wire [31:0] dbus_addr;
+  wire [31:0] dbus_data_i;
+  wire [31:0] dbus_data_o;
+  wire [3:0] dbus_be;
+  wire dbus_valid;
+
   ////        computed wires
   wire pipeline1_flush = go_branch; //  | go_trap | from_trap;
 
@@ -217,20 +222,42 @@ module core (
     .exu_dst_addr    (),            .lsu_dst_addr    (pipe2_dst_addr)
   );
 
-  LSU lsu_(
-    //input
-    .clk         (system_clk),
-    .rst         (system_rst),
-    .load_enable (),
-    .load_type   (),
-    .store_enable(),
-    .store_type  (),
-    .addr        (),
-    .store_data  (),
-    //output
-    .stall          (lsu_stall),
-    .load_data_valid(lsu_load_data_valid),
-    .load_data      (lsu_load_data)
+  // lsu lsu_(
+  //   //input
+  //   .clk         (system_clk),
+  //   .rst         (system_rst),
+  //   .load_enable (),
+  //   .load_type   (),
+  //   .store_enable(),
+  //   .store_type  (),
+  //   .addr        (),
+  //   .store_data  (),
+  //   //output
+  //   .stall          (lsu_stall),
+  //   .load_data_valid(lsu_load_data_valid),
+  //   .load_data      (lsu_load_data)
+  // );
+
+  lsu lsu_(
+  	.clk             (system_clk),
+    .rst             (system_rst),
+    .load_enable     (pipe2_load_enable),
+    .load_type       (pipe2_store_enable),
+    .store_enable    (pipe2_load_type),
+    .store_type      (pipe2_store_type),
+    .addr            (pipe2_dst_addr),
+    .store_data      (pipe2_store_data),
+
+    .stall           (stall           ),
+    .load_data_valid (load_data_valid ),
+    .load_data       (load_data       ),
+    .dbus_rd         (dbus_rd         ),
+    .dbus_wr         (dbus_wr         ),
+    .dbus_addr       (dbus_addr       ),
+    .dbus_data_i     (dbus_data_i     ),
+    .dbus_data_o     (dbus_data_o     ),
+    .dbus_be         (dbus_be         ),
+    .dbus_valid      (dbus_valid      )
   );
 
   // TODO: write back to regfile
