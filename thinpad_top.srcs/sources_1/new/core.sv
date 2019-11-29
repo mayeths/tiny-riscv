@@ -19,9 +19,6 @@ module core (
   output wire ext_ram_we_n       //ExtRAM写使能，低有效
 );
 
-  wire system_clk;
-  wire system_rst;
-
   ////////output of modules////////
   // Then what you need is assign them to next corresponding modules.
   ////        ifu
@@ -84,10 +81,10 @@ module core (
   wire        lsu_load_data_valid;
   wire [31:0] lsu_load_data;
   ////        computed wires
-  wire pipeline1_flush = go_branch | go_trap | from_trap;
+  wire pipeline1_flush = go_branch; //  | go_trap | from_trap;
 
 
-  IFU ifu_(
+  ifu ifu_(
     //input
     .clk      (system_clk),
     .rst      (system_rst),

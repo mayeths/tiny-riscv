@@ -80,6 +80,38 @@ module thinpad_top(
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
 
-    core core_1();
+wire locked, system_clk;
+pll_example clock_gen (
+    // Clock out ports
+    .clk_out1(system_clk), // cpu clock
+    // Status and control signals
+    .reset(reset_btn),
+    .locked(locked),
+    // Clock in ports
+    .clk_in1(clk_50M)
+);
+
+reg system_rst;
+always@(posedge system_clk or negedge locked) begin
+    if(~locked) system_rst <= 1'b1;
+    else        system_rst <= 1'b0;
+end
+
+core core_1(
+	.system_clk    (system_clk    ),
+    .system_rst    (system_rst    ),
+    .base_ram_data (base_ram_data ),
+    .base_ram_addr (base_ram_addr ),
+    .base_ram_be_n (base_ram_be_n ),
+    .base_ram_ce_n (base_ram_ce_n ),
+    .base_ram_oe_n (base_ram_oe_n ),
+    .base_ram_we_n (base_ram_we_n ),
+    .ext_ram_data  (ext_ram_data  ),
+    .ext_ram_addr  (ext_ram_addr  ),
+    .ext_ram_be_n  (ext_ram_be_n  ),
+    .ext_ram_ce_n  (ext_ram_ce_n  ),
+    .ext_ram_oe_n  (ext_ram_oe_n  ),
+    .ext_ram_we_n  (ext_ram_we_n  )
+);
 
 endmodule

@@ -3,8 +3,8 @@
 // IFU不预测分支，因为就一个周期冲刷的事
 
 module BRU (
-  input  wire pc,
-  input  wire inst,
+  input  wire [31:0] pc,
+  input  wire [31:0] inst,
   input  wire is_beq,
   input  wire is_bne,
   input  wire is_blt,

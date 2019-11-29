@@ -1,6 +1,6 @@
 // CSRU: CSR类指令执行单元
 // 所有CSR开头的和ecall, ebreak等指令（即所有与CSR打交道的）均由此模块处理
-`include "../defines.sv";
+`include "../defines.sv"
 
 module CSRU(
   input  logic [31:0] csr,

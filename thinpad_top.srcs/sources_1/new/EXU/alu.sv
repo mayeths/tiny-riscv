@@ -8,7 +8,7 @@
 // sll, srl, sra:    in1 = rs1, in2 = rs2
 // slli, srli, srai: in1 = rs1, in2 = imm(shamt)
 
-`include "../defines.sv";
+`include "../defines.sv"
 
 module ALU(
   input  logic[31:0] in1,

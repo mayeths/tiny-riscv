@@ -1,6 +1,6 @@
 // Decode Unit: 译码单元
 // 用于对IFU提供的指令进行译码
-`include "../defines.sv";
+`include "../defines.sv"
 
 module decode (
   input  wire [31:0] inst,
@@ -66,14 +66,14 @@ module decode (
   wire belong_fence  = opcode == `OP_FENCE;
   wire belong_system = opcode == `OP_SYSTEM;
   wire belong_amo    = opcode == `OP_AMO;
-  wire func3_000     = func3  == 3'b000;
-  wire func3_001     = func3  == 3'b001;
-  wire func3_010     = func3  == 3'b010;
-  wire func3_011     = func3  == 3'b011;
-  wire func3_100     = func3  == 3'b100;
-  wire func3_101     = func3  == 3'b101;
-  wire func3_110     = func3  == 3'b110;
-  wire func3_111     = func3  == 3'b111;
+  wire funct3_000     = funct3 == 3'b000;
+  wire funct3_001     = funct3 == 3'b001;
+  wire funct3_010     = funct3 == 3'b010;
+  wire funct3_011     = funct3 == 3'b011;
+  wire funct3_100     = funct3 == 3'b100;
+  wire funct3_101     = funct3 == 3'b101;
+  wire funct3_110     = funct3 == 3'b110;
+  wire funct3_111     = funct3 == 3'b111;
 
   ////////
   //misc instruction
@@ -82,72 +82,72 @@ module decode (
   wire is_jal   = opcode == `OP_JAL;
   wire is_jalr  = opcode == `OP_JALR;
   //branch
-  wire is_beq  = belong_branch & func3_000;
-  wire is_bne  = belong_branch & func3_001;
-  wire is_blt  = belong_branch & func3_100;
-  wire is_bge  = belong_branch & func3_101;
-  wire is_bltu = belong_branch & func3_110;
-  wire is_bgeu = belong_branch & func3_111;
+  wire is_beq  = belong_branch & funct3_000;
+  wire is_bne  = belong_branch & funct3_001;
+  wire is_blt  = belong_branch & funct3_100;
+  wire is_bge  = belong_branch & funct3_101;
+  wire is_bltu = belong_branch & funct3_110;
+  wire is_bgeu = belong_branch & funct3_111;
   //load
-  wire is_lb  = belong_load & func3_000;
-  wire is_lh  = belong_load & func3_001;
-  wire is_lw  = belong_load & func3_010;
-  wire is_lbu = belong_load & func3_100;
-  wire is_lhu = belong_load & func3_101;
+  wire is_lb  = belong_load & funct3_000;
+  wire is_lh  = belong_load & funct3_001;
+  wire is_lw  = belong_load & funct3_010;
+  wire is_lbu = belong_load & funct3_100;
+  wire is_lhu = belong_load & funct3_101;
   //store
-  wire is_sb = belong_store & func3_000;
-  wire is_sh = belong_store & func3_001;
-  wire is_sw = belong_store & func3_010;
+  wire is_sb = belong_store & funct3_000;
+  wire is_sh = belong_store & funct3_001;
+  wire is_sw = belong_store & funct3_010;
   //alui
-  wire is_addi  = belong_alui & func3_000;
-  wire is_slti  = belong_alui & func3_010;
-  wire is_sltiu = belong_alui & func3_011;
-  wire is_xori  = belong_alui & func3_100;
-  wire is_ori   = belong_alui & func3_110;
-  wire is_andi  = belong_alui & func3_111;
-  wire is_slli  = belong_alui & func3_001;
-  wire is_srli  = belong_alui & func3_101 & (funct7 == 7'b0000000);
-  wire is_srai  = belong_alui & func3_101 & (funct7 == 7'b0100000);
+  wire is_addi  = belong_alui & funct3_000;
+  wire is_slti  = belong_alui & funct3_010;
+  wire is_sltiu = belong_alui & funct3_011;
+  wire is_xori  = belong_alui & funct3_100;
+  wire is_ori   = belong_alui & funct3_110;
+  wire is_andi  = belong_alui & funct3_111;
+  wire is_slli  = belong_alui & funct3_001;
+  wire is_srli  = belong_alui & funct3_101 & (funct7 == 7'b0000000);
+  wire is_srai  = belong_alui & funct3_101 & (funct7 == 7'b0100000);
   //alur
-  wire is_add  = belong_alur & func3_000 & (funct7 == 7'b0000000);
-  wire is_sub  = belong_alur & func3_000 & (funct7 == 7'b0100000);
-  wire is_sll  = belong_alur & func3_001;
-  wire is_slt  = belong_alur & func3_010;
-  wire is_sltu = belong_alur & func3_011;
-  wire is_xor  = belong_alur & func3_100;
-  wire is_srl  = belong_alur & func3_101 & (funct7 == 7'b0000000);
-  wire is_sra  = belong_alur & func3_101 & (funct7 == 7'b0100000);
-  wire is_or   = belong_alur & func3_110;
-  wire is_and  = belong_alur & func3_111;
+  wire is_add  = belong_alur & funct3_000 & (funct7 == 7'b0000000);
+  wire is_sub  = belong_alur & funct3_000 & (funct7 == 7'b0100000);
+  wire is_sll  = belong_alur & funct3_001;
+  wire is_slt  = belong_alur & funct3_010;
+  wire is_sltu = belong_alur & funct3_011;
+  wire is_xor  = belong_alur & funct3_100;
+  wire is_srl  = belong_alur & funct3_101 & (funct7 == 7'b0000000);
+  wire is_sra  = belong_alur & funct3_101 & (funct7 == 7'b0100000);
+  wire is_or   = belong_alur & funct3_110;
+  wire is_and  = belong_alur & funct3_111;
   //fence
-  wire is_fence  = belong_fence & func3_000;
-  wire is_fencei = belong_fence & func3_001;
+  wire is_fence  = belong_fence & funct3_000;
+  wire is_fencei = belong_fence & funct3_001;
   //system
-  wire is_ecall  = belong_system & func3_000 & (rs2 == 5'b00000);
-  wire is_ebreak = belong_system & func3_000 & (rs2 == 5'b00001);
-  wire is_mret   = belong_system & func3_000 & (funct7 == 7'b0011000) & (rs2 == 5'b00010);
-  wire is_sret   = belong_system & func3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00010);
-  wire is_uret   = belong_system & func3_000 & (funct7 == 7'b0000000) & (rs2 == 5'b00010);
-  wire is_wfi    = belong_system & func3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00101);
-  wire is_sfence = belong_system & func3_000 & (funct7 == 7'b0001001);
-  wire is_csrrw  = belong_system & func3_001;
-  wire is_csrrs  = belong_system & func3_010;
-  wire is_csrrc  = belong_system & func3_011;
-  wire is_csrrwi = belong_system & func3_101;
-  wire is_csrrsi = belong_system & func3_110;
-  wire is_csrrci = belong_system & func3_111;
+  wire is_ecall  = belong_system & funct3_000 & (rs2 == 5'b00000);
+  wire is_ebreak = belong_system & funct3_000 & (rs2 == 5'b00001);
+  wire is_mret   = belong_system & funct3_000 & (funct7 == 7'b0011000) & (rs2 == 5'b00010);
+  wire is_sret   = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00010);
+  wire is_uret   = belong_system & funct3_000 & (funct7 == 7'b0000000) & (rs2 == 5'b00010);
+  wire is_wfi    = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00101);
+  wire is_sfence = belong_system & funct3_000 & (funct7 == 7'b0001001);
+  wire is_csrrw  = belong_system & funct3_001;
+  wire is_csrrs  = belong_system & funct3_010;
+  wire is_csrrc  = belong_system & funct3_011;
+  wire is_csrrwi = belong_system & funct3_101;
+  wire is_csrrsi = belong_system & funct3_110;
+  wire is_csrrci = belong_system & funct3_111;
   //amo
-  wire is_lrw      = belong_amo & func3_010 & (funct7[6:2] == 5'b00010);
-  wire is_scw      = belong_amo & func3_010 & (funct7[6:2] == 5'b00011);
-  wire is_amoswapw = belong_amo & func3_010 & (funct7[6:2] == 5'b00001);
-  wire is_amoaddw  = belong_amo & func3_010 & (funct7[6:2] == 5'b00000);
-  wire is_amoxorw  = belong_amo & func3_010 & (funct7[6:2] == 5'b00100);
-  wire is_amoandw  = belong_amo & func3_010 & (funct7[6:2] == 5'b01100);
-  wire is_amoorw   = belong_amo & func3_010 & (funct7[6:2] == 5'b01000);
-  wire is_amominw  = belong_amo & func3_010 & (funct7[6:2] == 5'b10000);
-  wire is_amomaxw  = belong_amo & func3_010 & (funct7[6:2] == 5'b10100);
-  wire is_amominuw = belong_amo & func3_010 & (funct7[6:2] == 5'b11000);
-  wire is_amomaxuw = belong_amo & func3_010 & (funct7[6:2] == 5'b11100);
+  wire is_lrw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00010);
+  wire is_scw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00011);
+  wire is_amoswapw = belong_amo & funct3_010 & (funct7[6:2] == 5'b00001);
+  wire is_amoaddw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00000);
+  wire is_amoxorw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00100);
+  wire is_amoandw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b01100);
+  wire is_amoorw   = belong_amo & funct3_010 & (funct7[6:2] == 5'b01000);
+  wire is_amominw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10000);
+  wire is_amomaxw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10100);
+  wire is_amominuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11000);
+  wire is_amomaxuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11100);
 
   ////////
   //alu action

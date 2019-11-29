@@ -53,19 +53,19 @@ parameter FLASH_INIT_FILE = "/tmp/kernel.elf";    //Flash初始化文件，请�
 assign rxd = 1'b1; //idle state
 
 initial begin 
-    //在这里可以自定义测试输入序列，例如：
-    dip_sw = 32'h2;
-    touch_btn = 0;
-    for (integer i = 0; i < 20; i = i+1) begin
-        #100; //等待100ns
-        clock_btn = 1; //按下手工时钟按钮
-        #100; //等待100ns
-        clock_btn = 0; //松开手工时钟按钮
-    end
-    // 模拟PC通过串口发送字符
-    cpld.pc_send_byte(8'h32);
-    #10000;
-    cpld.pc_send_byte(8'h33);
+    // //在这里可以自定义测试输入序列，例如：
+    // dip_sw = 32'h2;
+    // touch_btn = 0;
+    // for (integer i = 0; i < 20; i = i+1) begin
+    //     #100; //等待100ns
+    //     clock_btn = 1; //按下手工时钟按钮
+    //     #100; //等待100ns
+    //     clock_btn = 0; //松开手工时钟按钮
+    // end
+    // // 模拟PC通过串口发送字符
+    // cpld.pc_send_byte(8'h32);
+    // #10000;
+    // cpld.pc_send_byte(8'h33);
 end
 
 // 待测试用户设计

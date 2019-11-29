@@ -1,5 +1,5 @@
 // IFU (Intruction Fetch Unit): 取指单元
-`include "../defines.sv";
+`include "../defines.sv"
 
 module ifu(
   input  wire clk,

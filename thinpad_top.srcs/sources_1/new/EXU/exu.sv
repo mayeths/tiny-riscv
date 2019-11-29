@@ -48,10 +48,10 @@ module exu(
     .csr_out(csr_out)
   );
 
-  logic exu_out_alu  = exu_out_src == OUTPUT_ALU;
-  logic exu_out_csru = exu_out_src == OUTPUT_CSRU;
-  logic exu_out_mdu  = exu_out_src == OUTPUT_MDU;
-  logic exu_out_fpu  = exu_out_src == OUTPUT_FPU;
+  logic exu_out_alu  = exu_out_src == `OUTPUT_ALU;
+  logic exu_out_csru = exu_out_src == `OUTPUT_CSRU;
+  logic exu_out_mdu  = exu_out_src == `OUTPUT_MDU;
+  logic exu_out_fpu  = exu_out_src == `OUTPUT_FPU;
   assign exu_out = 32'b0
     | ({32{exu_out_alu }} & alu_out )
     | ({32{exu_out_csru}} & csru_out)
