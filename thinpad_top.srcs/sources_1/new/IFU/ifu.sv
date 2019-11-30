@@ -14,9 +14,9 @@ module ifu(
   output wire [31:0] data_addr,
   input  wire [31:0] data_rdata,
 
-  //Assign to regfile to get jalr target address.
-  input  wire [31:0] jalr_data,
-  output wire [4:0]  jalr_addr,
+  input wire go_jalr,
+  input wire [31:0] go_jalr_op1,
+  input wire [31:0] go_jalr_op2,
 
   //Assign to BRU to get branch target
   input  wire go_branch,
@@ -29,20 +29,18 @@ module ifu(
 
   ////// Control signals
   (* dont_touch = "true" *) wire is_jal  = inst[6:0] == `OP_JAL;
-  (* dont_touch = "true" *) wire is_jalr = inst[6:0] == `OP_JALR;
   (* dont_touch = "true" *) wire [31:0] immJal  = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0};
-  (* dont_touch = "true" *) wire [31:0] immJalr = {{21{inst[31]}}, inst[30:20]};
   ////// Bus
   // PC privilege: trap > branch > jal | jalr
   (* dont_touch = "true" *) wire [31:0] pc_next_op1 =
     go_branch ? go_branch_op1 :  // pc of EX phase
+    go_jalr   ? go_jalr_op1 :    // pc of EX phase
     is_jal    ? pc :             // pc of IF phase
-    is_jalr   ? jalr_data :      // rs1 of jalr instruction
     pc;                          // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next_op2 =
     go_branch ? go_branch_op2 :  // B-type imm32
+    go_jalr   ? go_jalr_op2 :    // pc of EX phase
     is_jal    ? immJal :         // J-type imm32
-    is_jalr   ? immJalr :        // I-type imm32
     32'h4;                       // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next = pc_next_op1 + pc_next_op2;
 

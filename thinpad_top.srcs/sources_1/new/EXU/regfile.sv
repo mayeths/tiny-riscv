@@ -1,16 +1,16 @@
 module regfile(
-  input  logic clk,
-  input  logic rst,
-  input  logic [4:0]  rs1_addr,
-  input  logic [4:0]  rs2_addr,
-  input  logic [4:0]  dst_addr,
-  input  logic        dst_enable,
-  input  logic [31:0] dst_data,
-  input  logic [4:0]  jalr_addr,
+  input  wire clk,
+  input  wire rst,
+  input  wire [4:0]  rs1_addr,
+  input  wire [4:0]  rs2_addr,
+  input  wire [4:0]  dst_addr,
+  input  wire        dst_enable,
+  input  wire [31:0] dst_data,
+  input  wire [4:0]  jalr_addr,
 
-  output logic [31:0] rs1_data,
-  output logic [31:0] rs2_data,
-  output logic [31:0] jalr_data
+  output wire [31:0] rs1_data,
+  output wire [31:0] rs2_data,
+  output wire [31:0] jalr_data
 );
 
   reg [31:0] regs[31:1];

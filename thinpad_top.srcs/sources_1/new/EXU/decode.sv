@@ -14,6 +14,7 @@ module decode (
   output wire        op1_is_pc,
   output wire        op2_is_imm,
   output wire [31:0] imm32,
+  output wire        is_jalr,
   output wire        is_beq,
   output wire        is_bne,
   output wire        is_blt,
@@ -86,7 +87,7 @@ module decode (
   (* dont_touch = "true" *) wire is_lui   = opcode == `OP_LUI;
   (* dont_touch = "true" *) wire is_auipc = opcode == `OP_AUIPC;
   (* dont_touch = "true" *) wire is_jal   = opcode == `OP_JAL;
-  (* dont_touch = "true" *) wire is_jalr  = opcode == `OP_JALR;
+  (* dont_touch = "true" *) assign is_jalr  = opcode == `OP_JALR;
   //branch
   assign is_beq  = belong_branch & funct3_000;
   assign is_bne  = belong_branch & funct3_001;

@@ -3,13 +3,13 @@
 `include "../defines.sv"
 
 module CSRU(
-  input  logic [31:0] csr,
-  input  logic [31:0] rs1,
-  input  logic [31:0] uimm32,
-  input  logic [2:0]  csru_action,
+  input  wire [31:0] csr,
+  input  wire [31:0] rs1,
+  input  wire [31:0] uimm32,
+  input  wire [2:0]  csru_action,
 
-  output logic [31:0] rd_out,
-  output logic [31:0] csr_out
+  output wire [31:0] rd_out,
+  output wire [31:0] csr_out
 );
 
   //bus.

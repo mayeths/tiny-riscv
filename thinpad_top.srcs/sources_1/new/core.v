@@ -162,6 +162,7 @@ module core (
   (* dont_touch = "true" *) wire        decode_op1_is_pc;
   (* dont_touch = "true" *) wire        decode_op2_is_imm;
   (* dont_touch = "true" *) wire [31:0] decode_imm32;
+  (* dont_touch = "true" *) wire        decode_is_jalr;
   (* dont_touch = "true" *) wire        decode_is_beq;
   (* dont_touch = "true" *) wire        decode_is_bne;
   (* dont_touch = "true" *) wire        decode_is_blt;
@@ -216,13 +217,13 @@ module core (
     .pc             (ifu_pc),
     .inst           (ifu_inst),
     //assign to axi_if
-    .data_req       (ibus_data_req),
-    .data_addr      (ibus_data_addr),
-    .data_rvalid    (ibus_data_rvalid),
-    .data_rdata     (ibus_data_rdata),
-    //assign to regfile
-    .jalr_data      (regfile_jalr_data),
-    .jalr_addr      (ifu_jalr_addr),
+    // .data_req       (ibus_data_req),
+    // .data_addr      (ibus_data_addr),
+    // .data_rvalid    (ibus_data_rvalid),
+    // .data_rdata     (ibus_data_rdata),
+    .go_jalr       (decode_is_jalr),
+    .go_jalr_op1   (regfile_rs1_data),
+    .go_jalr_op2   (32'b0),
     //assign to BRU
     .go_branch      (bru_go_branch),
     .go_branch_op1  (bru_go_branch_op1),
@@ -232,7 +233,7 @@ module core (
   pipeline1 pipeline1_(
     .clk    (system_clk),
     .rst    (system_rst),
-    .flush  (go_branch),
+    .flush  (bru_go_branch | decode_is_jalr),
     .stall  (),
     .if_pc  (ifu_pc),             .ex_pc  (pipe1_pc),
     .if_inst(ifu_inst),           .ex_inst(pipe1_inst)
@@ -250,6 +251,7 @@ module core (
     .op1_is_pc       (decode_op1_is_pc),
     .op2_is_imm      (decode_op2_is_imm),
     .imm32           (decode_imm32),
+    .is_jalr         (decode_is_jalr),
     .is_beq          (decode_is_beq),
     .is_bne          (decode_is_bne),
     .is_blt          (decode_is_blt),

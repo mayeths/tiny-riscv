@@ -4,27 +4,29 @@
 // 届时，还需要一个Dispatch Unit.
 
 module exu(
-  input  logic [31:0] rs1,
-  input  logic [31:0] rs2,
-  input  logic [31:0] pc,
-  input  logic [31:0] imm32,
-  input  logic        op1_is_pc,
-  input  logic        op2_is_imm,
-  input  logic [3:0]  alu_action,
-  input  logic [2:0]  csru_action,
-  input  logic [31:0] csr,
-  input  logic [31:0] uimm32,
-  input  logic [1:0]  exu_out_src,
+  input  wire [31:0] rs1,
+  input  wire [31:0] rs2,
+  input  wire [31:0] pc,
+  input  wire [31:0] imm32,
+  input  wire        op1_is_pc,
+  input  wire        op2_is_imm,
+  input  wire [3:0]  alu_action,
+  input  wire [2:0]  csru_action,
+  input  wire [31:0] csr,
+  input  wire [31:0] uimm32,
+  input  wire [1:0]  exu_out_src,
 
-  output logic [31:0] exu_out,
-  output logic [31:0] csr_out
+  output wire [31:0] exu_out,
+  output wire [31:0] csr_out
 );
-  (* dont_touch = "true" *) logic [31:0] in1 = op1_is_pc  ? pc    : rs1;
-  (* dont_touch = "true" *) logic [31:0] in2 = op2_is_imm ? imm32 : rs2;
-  (* dont_touch = "true" *) logic [31:0] alu_out;
-  (* dont_touch = "true" *) logic [31:0] csru_out;
-  (* dont_touch = "true" *) logic [31:0] mdu_out;
-  (* dont_touch = "true" *) logic [31:0] fpu_out;
+  (* dont_touch = "true" *) wire [31:0] in1 = op1_is_pc  ? pc    : rs1;
+  (* dont_touch = "true" *) wire [31:0] in2 = op2_is_imm ? imm32 : rs2;
+  (* dont_touch = "true" *) wire [31:0] alu_out;
+  (* dont_touch = "true" *) wire [31:0] csru_out;
+  (* dont_touch = "true" *) wire [31:0] mdu_out;
+  (* dont_touch = "true" *) wire [31:0] fpu_out;
+
+  wire [31:0] test = in1;
 
   ALU alu_(
     //input
@@ -45,10 +47,10 @@ module exu(
     .rd_out(csru_out),
     .csr_out(csr_out)
   );
-  (* dont_touch = "true" *) logic exu_out_alu  = exu_out_src == `OUTPUT_ALU;
-  (* dont_touch = "true" *) logic exu_out_csru = exu_out_src == `OUTPUT_CSRU;
-  (* dont_touch = "true" *) logic exu_out_mdu  = exu_out_src == `OUTPUT_MDU;
-  (* dont_touch = "true" *) logic exu_out_fpu  = exu_out_src == `OUTPUT_FPU;
+  (* dont_touch = "true" *) wire exu_out_alu  = exu_out_src == `OUTPUT_ALU;
+  (* dont_touch = "true" *) wire exu_out_csru = exu_out_src == `OUTPUT_CSRU;
+  (* dont_touch = "true" *) wire exu_out_mdu  = exu_out_src == `OUTPUT_MDU;
+  (* dont_touch = "true" *) wire exu_out_fpu  = exu_out_src == `OUTPUT_FPU;
   assign exu_out = 32'b0
     | ({32{exu_out_alu }} & alu_out )
     | ({32{exu_out_csru}} & csru_out)
