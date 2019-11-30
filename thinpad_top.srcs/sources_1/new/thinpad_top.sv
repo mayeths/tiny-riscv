@@ -116,45 +116,45 @@ end
 
 soc_bd_wrapper u_soc_bd_wrapper(
     .system_clk          (system_clk),
-    .system_rst          (system_rst),
+    .system_rst          (system_rst)
 
     // BaseRAM
-	.base_ram_if_addr    (base_ram_addr),
-    .base_ram_if_adv_ldn (),
-    .base_ram_if_ben     (base_ram_be_n),
-    .base_ram_if_ce      (),
-    .base_ram_if_ce_n    (base_ram_ce_n),
-    .base_ram_if_clken   (),
-    .base_ram_if_cre     (),
-    .base_ram_if_dq_io   (base_ram_data),
-    .base_ram_if_lbon    (),
-    .base_ram_if_oen     (base_ram_oe_n),
-    .base_ram_if_qwen    (),
-    .base_ram_if_rnw     (),
-    .base_ram_if_rpn     (),
-    .base_ram_if_wait    (),
-    .base_ram_if_wen     (base_ram_we_n),
+	// .base_ram_if_addr    (base_ram_addr),
+    // .base_ram_if_adv_ldn (),
+    // .base_ram_if_ben     (base_ram_be_n),
+    // .base_ram_if_ce      (),
+    // .base_ram_if_ce_n    (base_ram_ce_n),
+    // .base_ram_if_clken   (),
+    // .base_ram_if_cre     (),
+    // .base_ram_if_dq_io   (base_ram_data),
+    // .base_ram_if_lbon    (),
+    // .base_ram_if_oen     (base_ram_oe_n),
+    // .base_ram_if_qwen    (),
+    // .base_ram_if_rnw     (),
+    // .base_ram_if_rpn     (),
+    // .base_ram_if_wait    (),
+    // .base_ram_if_wen     (base_ram_we_n),
 
     // ExtRAM
-    .ext_ram_if_addr     (ext_ram_addr),
-    .ext_ram_if_adv_ldn  (),
-    .ext_ram_if_ben      (ext_ram_be_n),
-    .ext_ram_if_ce       (),
-    .ext_ram_if_ce_n     (ext_ram_ce_n),
-    .ext_ram_if_clken    (),
-    .ext_ram_if_cre      (),
-    .ext_ram_if_dq_io    (ext_ram_data),
-    .ext_ram_if_lbon     (),
-    .ext_ram_if_oen      (ext_ram_oe_n),
-    .ext_ram_if_qwen     (),
-    .ext_ram_if_rnw      (),
-    .ext_ram_if_rpn      (),
-    .ext_ram_if_wait     (),
-    .ext_ram_if_wen      (ext_ram_we_n),
+    // .ext_ram_if_addr     (ext_ram_addr),
+    // .ext_ram_if_adv_ldn  (),
+    // .ext_ram_if_ben      (ext_ram_be_n),
+    // .ext_ram_if_ce       (),
+    // .ext_ram_if_ce_n     (ext_ram_ce_n),
+    // .ext_ram_if_clken    (),
+    // .ext_ram_if_cre      (),
+    // .ext_ram_if_dq_io    (ext_ram_data),
+    // .ext_ram_if_lbon     (),
+    // .ext_ram_if_oen      (ext_ram_oe_n),
+    // .ext_ram_if_qwen     (),
+    // .ext_ram_if_rnw      (),
+    // .ext_ram_if_rpn      (),
+    // .ext_ram_if_wait     (),
+    // .ext_ram_if_wen      (ext_ram_we_n),
 
     // Direct UART
-    .uart_rxd            (rxd),
-    .uart_txd            (txd)
+    // .uart_rxd            (rxd),
+    // .uart_txd            (txd)
 );
 
 endmodule

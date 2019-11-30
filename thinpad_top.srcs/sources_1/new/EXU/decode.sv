@@ -58,35 +58,35 @@ module decode (
 
   ////////
   //basic
-  wire [6:0] opcode = inst[6:0];
-  wire [4:0] rd     = inst[11:7];
-  wire [2:0] funct3 = inst[14:12];
-  wire [4:0] rs1    = inst[19:15];
-  wire [4:0] rs2    = inst[24:20];
-  wire [6:0] funct7 = inst[31:25];
-  wire belong_branch = opcode == `OP_BRANCH;
-  wire belong_load   = opcode == `OP_LOAD;
-  wire belong_store  = opcode == `OP_STORE;
-  wire belong_alui   = opcode == `OP_ALUI;
-  wire belong_alur   = opcode == `OP_ALUR;
-  wire belong_fence  = opcode == `OP_FENCE;
-  wire belong_system = opcode == `OP_SYSTEM;
-  wire belong_amo    = opcode == `OP_AMO;
-  wire funct3_000     = funct3 == 3'b000;
-  wire funct3_001     = funct3 == 3'b001;
-  wire funct3_010     = funct3 == 3'b010;
-  wire funct3_011     = funct3 == 3'b011;
-  wire funct3_100     = funct3 == 3'b100;
-  wire funct3_101     = funct3 == 3'b101;
-  wire funct3_110     = funct3 == 3'b110;
-  wire funct3_111     = funct3 == 3'b111;
+  (* dont_touch = "true" *) wire [6:0] opcode = inst[6:0];
+  (* dont_touch = "true" *) wire [4:0] rd     = inst[11:7];
+  (* dont_touch = "true" *) wire [2:0] funct3 = inst[14:12];
+  (* dont_touch = "true" *) wire [4:0] rs1    = inst[19:15];
+  (* dont_touch = "true" *) wire [4:0] rs2    = inst[24:20];
+  (* dont_touch = "true" *) wire [6:0] funct7 = inst[31:25];
+  (* dont_touch = "true" *) wire belong_branch = opcode == `OP_BRANCH;
+  (* dont_touch = "true" *) wire belong_load   = opcode == `OP_LOAD;
+  (* dont_touch = "true" *) wire belong_store  = opcode == `OP_STORE;
+  (* dont_touch = "true" *) wire belong_alui   = opcode == `OP_ALUI;
+  (* dont_touch = "true" *) wire belong_alur   = opcode == `OP_ALUR;
+  (* dont_touch = "true" *) wire belong_fence  = opcode == `OP_FENCE;
+  (* dont_touch = "true" *) wire belong_system = opcode == `OP_SYSTEM;
+  (* dont_touch = "true" *) wire belong_amo    = opcode == `OP_AMO;
+  (* dont_touch = "true" *) wire funct3_000     = funct3 == 3'b000;
+  (* dont_touch = "true" *) wire funct3_001     = funct3 == 3'b001;
+  (* dont_touch = "true" *) wire funct3_010     = funct3 == 3'b010;
+  (* dont_touch = "true" *) wire funct3_011     = funct3 == 3'b011;
+  (* dont_touch = "true" *) wire funct3_100     = funct3 == 3'b100;
+  (* dont_touch = "true" *) wire funct3_101     = funct3 == 3'b101;
+  (* dont_touch = "true" *) wire funct3_110     = funct3 == 3'b110;
+  (* dont_touch = "true" *) wire funct3_111     = funct3 == 3'b111;
 
   ////////
   //misc instruction
-  wire is_lui   = opcode == `OP_LUI;
-  wire is_auipc = opcode == `OP_AUIPC;
-  wire is_jal   = opcode == `OP_JAL;
-  wire is_jalr  = opcode == `OP_JALR;
+  (* dont_touch = "true" *) wire is_lui   = opcode == `OP_LUI;
+  (* dont_touch = "true" *) wire is_auipc = opcode == `OP_AUIPC;
+  (* dont_touch = "true" *) wire is_jal   = opcode == `OP_JAL;
+  (* dont_touch = "true" *) wire is_jalr  = opcode == `OP_JALR;
   //branch
   assign is_beq  = belong_branch & funct3_000;
   assign is_bne  = belong_branch & funct3_001;
@@ -95,88 +95,88 @@ module decode (
   assign is_bltu = belong_branch & funct3_110;
   assign is_bgeu = belong_branch & funct3_111;
   //load
-  wire is_lb  = belong_load & funct3_000;
-  wire is_lh  = belong_load & funct3_001;
-  wire is_lw  = belong_load & funct3_010;
-  wire is_lbu = belong_load & funct3_100;
-  wire is_lhu = belong_load & funct3_101;
+  (* dont_touch = "true" *) wire is_lb  = belong_load & funct3_000;
+  (* dont_touch = "true" *) wire is_lh  = belong_load & funct3_001;
+  (* dont_touch = "true" *) wire is_lw  = belong_load & funct3_010;
+  (* dont_touch = "true" *) wire is_lbu = belong_load & funct3_100;
+  (* dont_touch = "true" *) wire is_lhu = belong_load & funct3_101;
   //store
-  wire is_sb = belong_store & funct3_000;
-  wire is_sh = belong_store & funct3_001;
-  wire is_sw = belong_store & funct3_010;
+  (* dont_touch = "true" *) wire is_sb = belong_store & funct3_000;
+  (* dont_touch = "true" *) wire is_sh = belong_store & funct3_001;
+  (* dont_touch = "true" *) wire is_sw = belong_store & funct3_010;
   //alui
-  wire is_addi  = belong_alui & funct3_000;
-  wire is_slti  = belong_alui & funct3_010;
-  wire is_sltiu = belong_alui & funct3_011;
-  wire is_xori  = belong_alui & funct3_100;
-  wire is_ori   = belong_alui & funct3_110;
-  wire is_andi  = belong_alui & funct3_111;
-  wire is_slli  = belong_alui & funct3_001;
-  wire is_srli  = belong_alui & funct3_101 & (funct7 == 7'b0000000);
-  wire is_srai  = belong_alui & funct3_101 & (funct7 == 7'b0100000);
+  (* dont_touch = "true" *) wire is_addi  = belong_alui & funct3_000;
+  (* dont_touch = "true" *) wire is_slti  = belong_alui & funct3_010;
+  (* dont_touch = "true" *) wire is_sltiu = belong_alui & funct3_011;
+  (* dont_touch = "true" *) wire is_xori  = belong_alui & funct3_100;
+  (* dont_touch = "true" *) wire is_ori   = belong_alui & funct3_110;
+  (* dont_touch = "true" *) wire is_andi  = belong_alui & funct3_111;
+  (* dont_touch = "true" *) wire is_slli  = belong_alui & funct3_001;
+  (* dont_touch = "true" *) wire is_srli  = belong_alui & funct3_101 & (funct7 == 7'b0000000);
+  (* dont_touch = "true" *) wire is_srai  = belong_alui & funct3_101 & (funct7 == 7'b0100000);
   //alur
-  wire is_add  = belong_alur & funct3_000 & (funct7 == 7'b0000000);
-  wire is_sub  = belong_alur & funct3_000 & (funct7 == 7'b0100000);
-  wire is_sll  = belong_alur & funct3_001;
-  wire is_slt  = belong_alur & funct3_010;
-  wire is_sltu = belong_alur & funct3_011;
-  wire is_xor  = belong_alur & funct3_100;
-  wire is_srl  = belong_alur & funct3_101 & (funct7 == 7'b0000000);
-  wire is_sra  = belong_alur & funct3_101 & (funct7 == 7'b0100000);
-  wire is_or   = belong_alur & funct3_110;
-  wire is_and  = belong_alur & funct3_111;
+  (* dont_touch = "true" *) wire is_add  = belong_alur & funct3_000 & (funct7 == 7'b0000000);
+  (* dont_touch = "true" *) wire is_sub  = belong_alur & funct3_000 & (funct7 == 7'b0100000);
+  (* dont_touch = "true" *) wire is_sll  = belong_alur & funct3_001;
+  (* dont_touch = "true" *) wire is_slt  = belong_alur & funct3_010;
+  (* dont_touch = "true" *) wire is_sltu = belong_alur & funct3_011;
+  (* dont_touch = "true" *) wire is_xor  = belong_alur & funct3_100;
+  (* dont_touch = "true" *) wire is_srl  = belong_alur & funct3_101 & (funct7 == 7'b0000000);
+  (* dont_touch = "true" *) wire is_sra  = belong_alur & funct3_101 & (funct7 == 7'b0100000);
+  (* dont_touch = "true" *) wire is_or   = belong_alur & funct3_110;
+  (* dont_touch = "true" *) wire is_and  = belong_alur & funct3_111;
   //fence
-  wire is_fence  = belong_fence & funct3_000;
-  wire is_fencei = belong_fence & funct3_001;
+  (* dont_touch = "true" *) wire is_fence  = belong_fence & funct3_000;
+  (* dont_touch = "true" *) wire is_fencei = belong_fence & funct3_001;
   //system
-  wire is_ecall  = belong_system & funct3_000 & (rs2 == 5'b00000);
-  wire is_ebreak = belong_system & funct3_000 & (rs2 == 5'b00001);
-  wire is_mret   = belong_system & funct3_000 & (funct7 == 7'b0011000) & (rs2 == 5'b00010);
-  wire is_sret   = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00010);
-  wire is_uret   = belong_system & funct3_000 & (funct7 == 7'b0000000) & (rs2 == 5'b00010);
-  wire is_wfi    = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00101);
-  wire is_sfence = belong_system & funct3_000 & (funct7 == 7'b0001001);
-  wire is_csrrw  = belong_system & funct3_001;
-  wire is_csrrs  = belong_system & funct3_010;
-  wire is_csrrc  = belong_system & funct3_011;
-  wire is_csrrwi = belong_system & funct3_101;
-  wire is_csrrsi = belong_system & funct3_110;
-  wire is_csrrci = belong_system & funct3_111;
+  (* dont_touch = "true" *) wire is_ecall  = belong_system & funct3_000 & (rs2 == 5'b00000);
+  (* dont_touch = "true" *) wire is_ebreak = belong_system & funct3_000 & (rs2 == 5'b00001);
+  (* dont_touch = "true" *) wire is_mret   = belong_system & funct3_000 & (funct7 == 7'b0011000) & (rs2 == 5'b00010);
+  (* dont_touch = "true" *) wire is_sret   = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00010);
+  (* dont_touch = "true" *) wire is_uret   = belong_system & funct3_000 & (funct7 == 7'b0000000) & (rs2 == 5'b00010);
+  (* dont_touch = "true" *) wire is_wfi    = belong_system & funct3_000 & (funct7 == 7'b0001000) & (rs2 == 5'b00101);
+  (* dont_touch = "true" *) wire is_sfence = belong_system & funct3_000 & (funct7 == 7'b0001001);
+  (* dont_touch = "true" *) wire is_csrrw  = belong_system & funct3_001;
+  (* dont_touch = "true" *) wire is_csrrs  = belong_system & funct3_010;
+  (* dont_touch = "true" *) wire is_csrrc  = belong_system & funct3_011;
+  (* dont_touch = "true" *) wire is_csrrwi = belong_system & funct3_101;
+  (* dont_touch = "true" *) wire is_csrrsi = belong_system & funct3_110;
+  (* dont_touch = "true" *) wire is_csrrci = belong_system & funct3_111;
   //amo
-  wire is_lrw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00010);
-  wire is_scw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00011);
-  wire is_amoswapw = belong_amo & funct3_010 & (funct7[6:2] == 5'b00001);
-  wire is_amoaddw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00000);
-  wire is_amoxorw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00100);
-  wire is_amoandw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b01100);
-  wire is_amoorw   = belong_amo & funct3_010 & (funct7[6:2] == 5'b01000);
-  wire is_amominw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10000);
-  wire is_amomaxw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10100);
-  wire is_amominuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11000);
-  wire is_amomaxuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11100);
+  (* dont_touch = "true" *) wire is_lrw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00010);
+  (* dont_touch = "true" *) wire is_scw      = belong_amo & funct3_010 & (funct7[6:2] == 5'b00011);
+  (* dont_touch = "true" *) wire is_amoswapw = belong_amo & funct3_010 & (funct7[6:2] == 5'b00001);
+  (* dont_touch = "true" *) wire is_amoaddw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00000);
+  (* dont_touch = "true" *) wire is_amoxorw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b00100);
+  (* dont_touch = "true" *) wire is_amoandw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b01100);
+  (* dont_touch = "true" *) wire is_amoorw   = belong_amo & funct3_010 & (funct7[6:2] == 5'b01000);
+  (* dont_touch = "true" *) wire is_amominw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10000);
+  (* dont_touch = "true" *) wire is_amomaxw  = belong_amo & funct3_010 & (funct7[6:2] == 5'b10100);
+  (* dont_touch = "true" *) wire is_amominuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11000);
+  (* dont_touch = "true" *) wire is_amomaxuw = belong_amo & funct3_010 & (funct7[6:2] == 5'b11100);
 
   ////////
   //alu action
-  wire need_add  = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | is_addi | is_add;
-  wire need_sub  = is_beq   | is_bne   | is_sub;
-  wire need_and  = is_andi  | is_and;
-  wire need_or   = is_ori   | is_or;
-  wire need_xor  = is_xori  | is_xor;
-  wire need_sll  = is_slli  | is_sll;
-  wire need_srl  = is_srli  | is_srl;
-  wire need_sra  = is_srai  | is_sra;
-  wire need_slt  = is_blt   | is_bge   | is_slti  | is_slt;
-  wire need_sltu = is_bltu  | is_bgeu  | is_sltiu | is_sltu;
+  (* dont_touch = "true" *) wire need_add  = is_lui   | is_auipc | is_jal | is_jalr | belong_load | belong_store | is_addi | is_add;
+  (* dont_touch = "true" *) wire need_sub  = is_beq   | is_bne   | is_sub;
+  (* dont_touch = "true" *) wire need_and  = is_andi  | is_and;
+  (* dont_touch = "true" *) wire need_or   = is_ori   | is_or;
+  (* dont_touch = "true" *) wire need_xor  = is_xori  | is_xor;
+  (* dont_touch = "true" *) wire need_sll  = is_slli  | is_sll;
+  (* dont_touch = "true" *) wire need_srl  = is_srli  | is_srl;
+  (* dont_touch = "true" *) wire need_sra  = is_srai  | is_sra;
+  (* dont_touch = "true" *) wire need_slt  = is_blt   | is_bge   | is_slti  | is_slt;
+  (* dont_touch = "true" *) wire need_sltu = is_bltu  | is_bgeu  | is_sltiu | is_sltu;
   //imm32. See p.18 & figure 2.4 of riscv-spec.pdf.
-  wire [31:0] imm32_Itype = {{21{inst[31]}}, inst[30:25], inst[24:21], inst[20]};
-  wire [31:0] imm32_Stype = {{21{inst[31]}}, inst[30:25], inst[11:8],  inst[7]};
-  wire [31:0] imm32_Utype = {inst[31], inst[30:20], inst[19:12], 12'b0};
-  wire [31:0] imm32_Jtype = 32'h4;  // jal, jalr store pc+4 to rd(instead of pc+imm+4).
+  (* dont_touch = "true" *) wire [31:0] imm32_Itype = {{21{inst[31]}}, inst[30:25], inst[24:21], inst[20]};
+  (* dont_touch = "true" *) wire [31:0] imm32_Stype = {{21{inst[31]}}, inst[30:25], inst[11:8],  inst[7]};
+  (* dont_touch = "true" *) wire [31:0] imm32_Utype = {inst[31], inst[30:20], inst[19:12], 12'b0};
+  (* dont_touch = "true" *) wire [31:0] imm32_Jtype = 32'h4;  // jal, jalr store pc+4 to rd(instead of pc+imm+4).
   //instruction type, to detemine imm32.
-  wire Itype = belong_load | belong_alui | is_fencei;  // note that imm32_Itype contains shamt for sll.
-  wire Stype = belong_store;
-  wire Utype = is_lui | is_auipc;
-  wire Jtype = is_jal | is_jalr;  // Though jalr belong to Itype, it use 32'h4 as imm32.
+  (* dont_touch = "true" *) wire Itype = belong_load | belong_alui | is_fencei;  // note that imm32_Itype contains shamt for sll.
+  (* dont_touch = "true" *) wire Stype = belong_store;
+  (* dont_touch = "true" *) wire Utype = is_lui | is_auipc;
+  (* dont_touch = "true" *) wire Jtype = is_jal | is_jalr;  // Though jalr belong to Itype, it use 32'h4 as imm32.
 
   /**********************
    * Decode results.

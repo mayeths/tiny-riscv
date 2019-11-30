@@ -37,7 +37,7 @@ module MTrap(
 );
 
   //// Initial value of CSRs
-  wire [31:0] initial_mstatus = {
+  (* dont_touch = "true" *) wire [31:0] initial_mstatus = {
     1'b0,        // 31 SD
     8'b00000000, // 30~23 Reserved
     1'b0,  1'b0,  1'b0,        // 22~20 TSR, TW,  TVM (Virtualization support)
@@ -47,7 +47,7 @@ module MTrap(
     1'b1,  1'b0,  1'b1, 1'b1,  // 7~4   MPIE, Reserved, SPIE, UPIE (Previous xie before Trap)
     1'b1,  1'b0,  1'b1, 1'b1   // 3~0   MIE,  Reserved, SIE,  UIE (Interrupt enable)
   };
-  wire [31:0] initial_misa = {
+  (* dont_touch = "true" *) wire [31:0] initial_misa = {
     2'b01,   // 31~30 MXL
     4'b0000, // 29~26 WLRL
     1'b0, // 25 Z Reserved
@@ -77,21 +77,21 @@ module MTrap(
     1'b0, // 1  B Tentatively reserved for Bit operations extension
     1'b1  // 0  A Atomic extension
   };
-  wire [31:0] initial_medeleg = 32'b0;
-  wire [31:0] initial_mideleg = 32'b0;
-  wire [31:0] initial_mie     = {
+  (* dont_touch = "true" *) wire [31:0] initial_medeleg = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mideleg = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mie     = {
     20'b0000_0000_0000_0000_0000,  // 31~12 Reserved
     1'b0, 1'b0, 1'b0, 1'b0,        // 11~8  MEIE, Reserved, SEIE, UEIE
     1'b0, 1'b0, 1'b0, 1'b0,        // 7~4   MTIE, Reserved, STIE, UTIE
     1'b0, 1'b0, 1'b0, 1'b0         // 3~0   MSIE, Reserved, SSIE, USIE
   };
-  wire [31:0] initial_mtvec      = 32'b0;
-  wire [31:0] initial_mcounteren = 32'b0;
-  wire [31:0] initial_mscratch   = 32'b0;
-  wire [31:0] initial_mepc       = 32'b0;
-  wire [31:0] initial_mcause     = 32'b0;
-  wire [31:0] initial_mtval      = 32'b0;
-  wire [31:0] initial_mip        = {
+  (* dont_touch = "true" *) wire [31:0] initial_mtvec      = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mcounteren = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mscratch   = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mepc       = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mcause     = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mtval      = 32'b0;
+  (* dont_touch = "true" *) wire [31:0] initial_mip        = {
     20'b0000_0000_0000_0000_0000,  // 31~12 Reserved
     1'b0, 1'b0, 1'b0, 1'b0,        // 11~8  MEIP, Reserved, SEIP, UEIP
     1'b0, 1'b0, 1'b0, 1'b0,        // 7~4   MTIP, Reserved, STIP, UTIP
@@ -99,7 +99,7 @@ module MTrap(
   };
 
   //// Normal write write_data to CSRs with CSRRx instruction have some constraint. Specify them here.
-  wire [31:0] in_mstatus = {
+  (* dont_touch = "true" *) wire [31:0] in_mstatus = {
     mstatus[31], // 31 SD Read-Only
     8'b00000000,     // 30~23 Reserved
     write_data[22], write_data[21], write_data[20],    // 22~20 TSR, TW,  TVM
@@ -109,36 +109,36 @@ module MTrap(
     write_data[7], 1'b0, write_data[5], write_data[4], // 7~4   MPIE, Reserved, SPIE, UPIE
     write_data[3], 1'b0, write_data[1], write_data[0]  // 3~0   MIE,  Reserved, SIE, UIE
   };
-  wire [31:0] in_misa = {
+  (* dont_touch = "true" *) wire [31:0] in_misa = {
     write_data[31:5],
     initial_misa[4],  // 4 E Read-Only
     write_data[3:0]
   };
-  wire [31:0] in_medeleg    = write_data;
-  wire [31:0] in_mideleg    = write_data;
-  wire [31:0] in_mie        = write_data;
-  wire [31:0] in_mtvec      = write_data;
-  wire [31:0] in_mcounteren = write_data;
-  wire [31:0] in_mscratch   = write_data;
-  wire [31:0] in_mepc       = write_data;
-  wire [31:0] in_mcause     = write_data;
-  wire [31:0] in_mtval      = write_data;
-  wire [31:0] in_mip        = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_medeleg    = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mideleg    = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mie        = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mtvec      = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mcounteren = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mscratch   = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mepc       = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mcause     = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mtval      = write_data;
+  (* dont_touch = "true" *) wire [31:0] in_mip        = write_data;
 
 
   //// Normal write CSRs enable.
-  wire [31:0] write_mstatus_enable    = write_addr == 12'h300;
-  wire [31:0] write_misa_enable       = write_addr == 12'h301;
-  wire [31:0] write_medeleg_enable    = write_addr == 12'h302;
-  wire [31:0] write_mideleg_enable    = write_addr == 12'h303;
-  wire [31:0] write_mie_enable        = write_addr == 12'h304;
-  wire [31:0] write_mtvec_enable      = write_addr == 12'h305;
-  wire [31:0] write_mcounteren_enable = write_addr == 12'h306;
-  wire [31:0] write_mscratch_enable   = write_addr == 12'h340;
-  wire [31:0] write_mepc_enable       = write_addr == 12'h341;
-  wire [31:0] write_mcause_enable     = write_addr == 12'h342;
-  wire [31:0] write_mtval_enable      = write_addr == 12'h343;
-  wire [31:0] write_mip_enable        = write_addr == 12'h344;
+  (* dont_touch = "true" *) wire [31:0] write_mstatus_enable    = write_addr == 12'h300;
+  (* dont_touch = "true" *) wire [31:0] write_misa_enable       = write_addr == 12'h301;
+  (* dont_touch = "true" *) wire [31:0] write_medeleg_enable    = write_addr == 12'h302;
+  (* dont_touch = "true" *) wire [31:0] write_mideleg_enable    = write_addr == 12'h303;
+  (* dont_touch = "true" *) wire [31:0] write_mie_enable        = write_addr == 12'h304;
+  (* dont_touch = "true" *) wire [31:0] write_mtvec_enable      = write_addr == 12'h305;
+  (* dont_touch = "true" *) wire [31:0] write_mcounteren_enable = write_addr == 12'h306;
+  (* dont_touch = "true" *) wire [31:0] write_mscratch_enable   = write_addr == 12'h340;
+  (* dont_touch = "true" *) wire [31:0] write_mepc_enable       = write_addr == 12'h341;
+  (* dont_touch = "true" *) wire [31:0] write_mcause_enable     = write_addr == 12'h342;
+  (* dont_touch = "true" *) wire [31:0] write_mtval_enable      = write_addr == 12'h343;
+  (* dont_touch = "true" *) wire [31:0] write_mip_enable        = write_addr == 12'h344;
 
   always @(posedge clk) begin
     if (rst) begin

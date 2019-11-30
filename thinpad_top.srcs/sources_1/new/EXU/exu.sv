@@ -19,14 +19,12 @@ module exu(
   output logic [31:0] exu_out,
   output logic [31:0] csr_out
 );
-
-  logic [31:0] in1 = op1_is_pc  ? pc    : rs1;
-  logic [31:0] in2 = op2_is_imm ? imm32 : rs2;
-
-  logic [31:0] alu_out;
-  logic [31:0] csru_out;
-  logic [31:0] mdu_out;
-  logic [31:0] fpu_out;
+  (* dont_touch = "true" *) logic [31:0] in1 = op1_is_pc  ? pc    : rs1;
+  (* dont_touch = "true" *) logic [31:0] in2 = op2_is_imm ? imm32 : rs2;
+  (* dont_touch = "true" *) logic [31:0] alu_out;
+  (* dont_touch = "true" *) logic [31:0] csru_out;
+  (* dont_touch = "true" *) logic [31:0] mdu_out;
+  (* dont_touch = "true" *) logic [31:0] fpu_out;
 
   ALU alu_(
     //input
@@ -47,11 +45,10 @@ module exu(
     .rd_out(csru_out),
     .csr_out(csr_out)
   );
-
-  logic exu_out_alu  = exu_out_src == `OUTPUT_ALU;
-  logic exu_out_csru = exu_out_src == `OUTPUT_CSRU;
-  logic exu_out_mdu  = exu_out_src == `OUTPUT_MDU;
-  logic exu_out_fpu  = exu_out_src == `OUTPUT_FPU;
+  (* dont_touch = "true" *) logic exu_out_alu  = exu_out_src == `OUTPUT_ALU;
+  (* dont_touch = "true" *) logic exu_out_csru = exu_out_src == `OUTPUT_CSRU;
+  (* dont_touch = "true" *) logic exu_out_mdu  = exu_out_src == `OUTPUT_MDU;
+  (* dont_touch = "true" *) logic exu_out_fpu  = exu_out_src == `OUTPUT_FPU;
   assign exu_out = 32'b0
     | ({32{exu_out_alu }} & alu_out )
     | ({32{exu_out_csru}} & csru_out)

@@ -95,43 +95,43 @@ module CSRHub(
 );
 
   //// MTrap CSRs
-  wire [31:0] csr_mstatus;
-  wire [31:0] csr_misa;
-  wire [31:0] csr_medeleg;
-  wire [31:0] csr_mideleg;
-  wire [31:0] csr_mie;
-  wire [31:0] csr_mtvec;
-  wire [31:0] csr_mcounteren;
-  wire [31:0] csr_mscratch;
-  wire [31:0] csr_mepc;
-  wire [31:0] csr_mcause;
-  wire [31:0] csr_mtval;
-  wire [31:0] csr_mip;
+  (* dont_touch = "true" *) wire [31:0] csr_mstatus;
+  (* dont_touch = "true" *) wire [31:0] csr_misa;
+  (* dont_touch = "true" *) wire [31:0] csr_medeleg;
+  (* dont_touch = "true" *) wire [31:0] csr_mideleg;
+  (* dont_touch = "true" *) wire [31:0] csr_mie;
+  (* dont_touch = "true" *) wire [31:0] csr_mtvec;
+  (* dont_touch = "true" *) wire [31:0] csr_mcounteren;
+  (* dont_touch = "true" *) wire [31:0] csr_mscratch;
+  (* dont_touch = "true" *) wire [31:0] csr_mepc;
+  (* dont_touch = "true" *) wire [31:0] csr_mcause;
+  (* dont_touch = "true" *) wire [31:0] csr_mtval;
+  (* dont_touch = "true" *) wire [31:0] csr_mip;
   //Special write to CSRs, like trap setup
-  wire update_mstatus_enable;
-  wire update_misa_enable;
-  wire update_medeleg_enable;
-  wire update_mideleg_enable;
-  wire update_mie_enable;
-  wire update_mtvec_enable;
-  wire update_mcounteren_enable;
-  wire update_mscratch_enable;
-  wire update_mepc_enable;
-  wire update_mcause_enable;
-  wire update_mtval_enable;
-  wire update_mip_enable;
-  wire [31:0] update_mstatus_data;
-  wire [31:0] update_misa_data;
-  wire [31:0] update_medeleg_data;
-  wire [31:0] update_mideleg_data;
-  wire [31:0] update_mie_data;
-  wire [31:0] update_mtvec_data;
-  wire [31:0] update_mcounteren_data;
-  wire [31:0] update_mscratch_data;
-  wire [31:0] update_mepc_data;
-  wire [31:0] update_mcause_data;
-  wire [31:0] update_mtval_data;
-  wire [31:0] update_mip_data;
+  (* dont_touch = "true" *) wire update_mstatus_enable;
+  (* dont_touch = "true" *) wire update_misa_enable;
+  (* dont_touch = "true" *) wire update_medeleg_enable;
+  (* dont_touch = "true" *) wire update_mideleg_enable;
+  (* dont_touch = "true" *) wire update_mie_enable;
+  (* dont_touch = "true" *) wire update_mtvec_enable;
+  (* dont_touch = "true" *) wire update_mcounteren_enable;
+  (* dont_touch = "true" *) wire update_mscratch_enable;
+  (* dont_touch = "true" *) wire update_mepc_enable;
+  (* dont_touch = "true" *) wire update_mcause_enable;
+  (* dont_touch = "true" *) wire update_mtval_enable;
+  (* dont_touch = "true" *) wire update_mip_enable;
+  (* dont_touch = "true" *) wire [31:0] update_mstatus_data;
+  (* dont_touch = "true" *) wire [31:0] update_misa_data;
+  (* dont_touch = "true" *) wire [31:0] update_medeleg_data;
+  (* dont_touch = "true" *) wire [31:0] update_mideleg_data;
+  (* dont_touch = "true" *) wire [31:0] update_mie_data;
+  (* dont_touch = "true" *) wire [31:0] update_mtvec_data;
+  (* dont_touch = "true" *) wire [31:0] update_mcounteren_data;
+  (* dont_touch = "true" *) wire [31:0] update_mscratch_data;
+  (* dont_touch = "true" *) wire [31:0] update_mepc_data;
+  (* dont_touch = "true" *) wire [31:0] update_mcause_data;
+  (* dont_touch = "true" *) wire [31:0] update_mtval_data;
+  (* dont_touch = "true" *) wire [31:0] update_mip_data;
   MTrap MTrap_(
     .clk(clk), .rst(rst), .write_addr(write_addr), .write_data(write_data),
     .mstatus   (csr_mstatus),
@@ -206,7 +206,7 @@ module CSRHub(
   // 准备工作
   /////////
   // 发生异常和中断的原因
-  wire [31:0] exception_cause = { // See Table3.6 for detail
+  (* dont_touch = "true" *) wire [31:0] exception_cause = { // See Table3.6 for detail
     1'b0, 15'b0,  // 最高位置0，用于写入xcause时指示为exception
     exception_page_fault_sAMO, 1'b0, exception_page_fault_load,    exception_page_fault_inst,
     exception_ecall_M,         1'b0, exception_ecall_S,            exception_ecall_U,
@@ -215,7 +215,7 @@ module CSRHub(
     exception_breakpoint,            exception_illegal_inst,
     exception_access_fault_inst,     exception_addr_misalign_inst
   };
-  wire [31:0] interrupt_cause = { // See Table3.6 for detail
+  (* dont_touch = "true" *) wire [31:0] interrupt_cause = { // See Table3.6 for detail
     1'b1, 15'b0, 4'b0, // 最高位置1，用于写入xcause时指示为exception
     interrupt_external_M, 1'b0, interrupt_external_S, interrupt_external_U,
     interrupt_timer_M,    1'b0, interrupt_timer_S,    interrupt_timer_U,
@@ -223,16 +223,16 @@ module CSRHub(
   };
 
   // 当前时刻有可用的异常和中断
-  wire has_exception = exception_cause != 32'b0;  // 有可用的异常
-  wire has_interrupt = 1'b0                       // 有可用的中断
+  (* dont_touch = "true" *) wire has_exception = exception_cause != 32'b0;  // 有可用的异常
+  (* dont_touch = "true" *) wire has_interrupt = 1'b0                       // 有可用的中断
     | ({12{mode == `MODE_M}} & interrupt_cause[11:0] & csr_mie[11:0]) // M-mode下看mie
     | ({12{mode == `MODE_S}} & interrupt_cause[11:0] & csr_sie[11:0]) // S-mode下看sie
     | ({12{mode == `MODE_U}} & interrupt_cause[11:0] & csr_uie[11:0]) // U-mode下看uie
     ;
 
   // 中断时的跳转地址是否需要加偏移量：x由tvec[1:0]指示
-  wire interrupt_vectored = (mode == `MODE_M && csr_mtvec[1:0] == 2'b01) | (mode == `MODE_S && csr_stvec[1:0] == 2'b01);
-  wire [31:0] interrupt_vectored_to =    //spec并未指定中断的优先级，该实现的interrupt_vectored_to最下面那个中断胜利。
+  (* dont_touch = "true" *) wire interrupt_vectored = (mode == `MODE_M && csr_mtvec[1:0] == 2'b01) | (mode == `MODE_S && csr_stvec[1:0] == 2'b01);
+  (* dont_touch = "true" *) wire [31:0] interrupt_vectored_to =    //spec并未指定中断的优先级，该实现的interrupt_vectored_to最下面那个中断胜利。
     interrupt_software_U ? 32'h0  << 2 :
     interrupt_software_S ? 32'h1  << 2 :
     interrupt_software_M ? 32'h3  << 2 :
@@ -245,9 +245,9 @@ module CSRHub(
     32'b0;
 
   // 决定哪个模式下处理该Trap。默认M-mode下处理，当medeleg或mideleg对应bit为1时委托给S-mode
-  wire go_utrap_handle  = 1'b0;  // We don't implement U-mode trap(N extension).
-  wire go_strap_handler = (exception_cause & csr_medeleg | interrupt_cause & csr_mideleg) ? 1'b1 : 1'b0;
-  wire go_mtrap_handler = !go_utrap_handle & !go_strap_handler;  // handle trap in M-mode by default
+  (* dont_touch = "true" *) wire go_utrap_handle  = 1'b0;  // We don't implement U-mode trap(N extension).
+  (* dont_touch = "true" *) wire go_strap_handler = (exception_cause & csr_medeleg | interrupt_cause & csr_mideleg) ? 1'b1 : 1'b0;
+  (* dont_touch = "true" *) wire go_mtrap_handler = !go_utrap_handle & !go_strap_handler;  // handle trap in M-mode by default
 
   // 进入Trap的go_trap信号以及跳转目的地(go_trap_op1 + go_trap_op2)
   assign go_trap     = (has_exception | has_interrupt) & !is_traping;
@@ -282,8 +282,8 @@ module CSRHub(
   // go_trap：更新CSR -- xstatus, xcause, xepc, xtval
   /////////
   // go_mstatus: mode切换到X；使XPP为当前mode；使XPIE为XIE；使XIE为0
-  wire go_update_mstatus_enable      = go_mtrap_handler;
-  wire [31:0] go_update_mstatus_data = {
+  (* dont_touch = "true" *) wire go_update_mstatus_enable      = go_mtrap_handler;
+  (* dont_touch = "true" *) wire [31:0] go_update_mstatus_data = {
     csr_mstatus[31:13],  //SD, TSR, TW, TVM, MXR, SUM, MPRV, XS, FS
 
     // MPP, Reserved, SPP
@@ -306,12 +306,12 @@ module CSRHub(
 
   // go_mcause: 记录发生Trap的原因，同时发生时有 exception > interrupt
   // 所有cause都一股脑写入mcause，由程序去判断cause的优先级(见「手把手教你设计CPU——RISC-V处理器」图13-5)
-  wire go_update_mcause_enable      = go_mtrap_handler;
-  wire [31:0] go_update_mcause_data = has_exception ? exception_cause : interrupt_cause;
+  (* dont_touch = "true" *) wire go_update_mcause_enable      = go_mtrap_handler;
+  (* dont_touch = "true" *) wire [31:0] go_update_mcause_data = has_exception ? exception_cause : interrupt_cause;
 
   // go_mepc: 记录发生Trap的PC地址，优先级见Table3.7。
-  wire go_update_mepc_enable      = go_mtrap_handler;
-  wire [31:0] go_update_mepc_data =
+  (* dont_touch = "true" *) wire go_update_mepc_enable      = go_mtrap_handler;
+  (* dont_touch = "true" *) wire [31:0] go_update_mepc_data =
     exception_page_fault_inst     ? ifu_pc :
     exception_access_fault_inst   ? ifu_pc :
     exception_illegal_inst        ? exu_pc :
@@ -327,8 +327,8 @@ module CSRHub(
     ifu_pc;  // 中断优先级低于异常，此时记录还未执行的PC(ifu_pc)。毕竟中断的到来无法预测，晚一会处理也没关系。
 
   // go_mtval: 记录发生Trap的异常值，协助程序解决Trap。如illegal_inst就是指令编码，访存出错就是(虚拟)存储器地址。
-  wire go_update_mtval_enable      = go_mtrap_handler;
-  wire [31:0] go_update_mtval_data =
+  (* dont_touch = "true" *) wire go_update_mtval_enable      = go_mtrap_handler;
+  (* dont_touch = "true" *) wire [31:0] go_update_mtval_data =
     exception_page_fault_inst     ? ifu_memory_addr :
     exception_access_fault_inst   ? ifu_memory_addr :
     exception_illegal_inst        ? exu_instruction :
@@ -347,8 +347,8 @@ module CSRHub(
   // from_trap：更新 status CSR
   /////////
   // from_mstatus: mode切换到XPP；使XPP为U-mode；使XIE为XPIE；使XPIE为1
-  wire from_update_mstatus_enable      = mode == `MODE_M & from_trap;
-  wire [31:0] from_update_mstatus_data = {
+  (* dont_touch = "true" *) wire from_update_mstatus_enable      = mode == `MODE_M & from_trap;
+  (* dont_touch = "true" *) wire [31:0] from_update_mstatus_data = {
     csr_mstatus[31:13],  //SD, TSR, TW, TVM, MXR, SUM, MPRV, XS, FS
 
     //MPP, Reserved, SPP

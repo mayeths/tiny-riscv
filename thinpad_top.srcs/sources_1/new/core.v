@@ -133,77 +133,77 @@ module core (
   ////////output of modules////////
   // Then what you need is assign them to next corresponding modules.
   ////        ibus_axi_if
-  wire                          ibus_data_req;
-  wire                          ibus_data_rvalid;
-  wire [AXI4_ADDRESS_WIDTH-1:0] ibus_data_addr;
-  wire [AXI4_RDATA_WIDTH-1:0]   ibus_data_rdata;
+  (* dont_touch = "true" *) wire                          ibus_data_req;
+  (* dont_touch = "true" *) wire                          ibus_data_rvalid;
+  (* dont_touch = "true" *) wire [AXI4_ADDRESS_WIDTH-1:0] ibus_data_addr;
+  (* dont_touch = "true" *) wire [AXI4_RDATA_WIDTH-1:0]   ibus_data_rdata;
   ////        dbus_axi_if
-  wire                          dbus_data_req;
-  wire                          dbus_data_we;
-  wire                          dbus_data_rvalid;
-  wire                          dbus_data_gnt;
-  wire [AXI4_ADDRESS_WIDTH-1:0] dbus_data_addr;
-  wire [AXI4_RDATA_WIDTH-1:0]   dbus_data_rdata;
-  wire [3:0]                    dbus_data_be;
-  wire [AXI4_WDATA_WIDTH-1:0]   dbus_data_wdata;
+  (* dont_touch = "true" *) wire                          dbus_data_req;
+  (* dont_touch = "true" *) wire                          dbus_data_we;
+  (* dont_touch = "true" *) wire                          dbus_data_rvalid;
+  (* dont_touch = "true" *) wire                          dbus_data_gnt;
+  (* dont_touch = "true" *) wire [AXI4_ADDRESS_WIDTH-1:0] dbus_data_addr;
+  (* dont_touch = "true" *) wire [AXI4_RDATA_WIDTH-1:0]   dbus_data_rdata;
+  (* dont_touch = "true" *) wire [3:0]                    dbus_data_be;
+  (* dont_touch = "true" *) wire [AXI4_WDATA_WIDTH-1:0]   dbus_data_wdata;
   ////        ifu
-  wire [31:0] ifu_pc;
-  wire [31:0] ifu_inst;
-  wire [4:0]  ifu_jalr_addr;
+  (* dont_touch = "true" *) wire [31:0] ifu_pc;
+  (* dont_touch = "true" *) wire [31:0] ifu_inst;
+  (* dont_touch = "true" *) wire [4:0]  ifu_jalr_addr;
   ////        pipeline1
-  wire [31:0] pipe1_pc;
-  wire [31:0] pipe1_inst;
+  (* dont_touch = "true" *) wire [31:0] pipe1_pc;
+  (* dont_touch = "true" *) wire [31:0] pipe1_inst;
   ////        decode
-  wire        decode_rs1_enable;
-  wire        decode_rs2_enable;
-  wire [4:0]  decode_rs1_addr;
-  wire [4:0]  decode_rs2_addr;
-  wire [3:0]  decode_alu_action;
-  wire        decode_op1_is_pc;
-  wire        decode_op2_is_imm;
-  wire [31:0] decode_imm32;
-  wire        decode_is_beq;
-  wire        decode_is_bne;
-  wire        decode_is_blt;
-  wire        decode_is_bge;
-  wire        decode_is_bltu;
-  wire        decode_is_bgeu;
-  wire        decode_dst_enable;
-  wire [4:0]  decode_dst_addr;
-  wire        decode_load_enable;
-  wire        decode_store_enable;
-  wire [2:0]  decode_load_type;
-  wire [1:0]  decode_store_type;
-  wire [1:0]  decode_exu_out_src;
-  wire [11:0] decode_csr_addr;
-  wire        decode_csr_read_enable;
-  wire        decode_csr_write_enable;
-  wire [2:0]  decode_csru_action;
-  wire [31:0] decode_uimm32;
+  (* dont_touch = "true" *) wire        decode_rs1_enable;
+  (* dont_touch = "true" *) wire        decode_rs2_enable;
+  (* dont_touch = "true" *) wire [4:0]  decode_rs1_addr;
+  (* dont_touch = "true" *) wire [4:0]  decode_rs2_addr;
+  (* dont_touch = "true" *) wire [3:0]  decode_alu_action;
+  (* dont_touch = "true" *) wire        decode_op1_is_pc;
+  (* dont_touch = "true" *) wire        decode_op2_is_imm;
+  (* dont_touch = "true" *) wire [31:0] decode_imm32;
+  (* dont_touch = "true" *) wire        decode_is_beq;
+  (* dont_touch = "true" *) wire        decode_is_bne;
+  (* dont_touch = "true" *) wire        decode_is_blt;
+  (* dont_touch = "true" *) wire        decode_is_bge;
+  (* dont_touch = "true" *) wire        decode_is_bltu;
+  (* dont_touch = "true" *) wire        decode_is_bgeu;
+  (* dont_touch = "true" *) wire        decode_dst_enable;
+  (* dont_touch = "true" *) wire [4:0]  decode_dst_addr;
+  (* dont_touch = "true" *) wire        decode_load_enable;
+  (* dont_touch = "true" *) wire        decode_store_enable;
+  (* dont_touch = "true" *) wire [2:0]  decode_load_type;
+  (* dont_touch = "true" *) wire [1:0]  decode_store_type;
+  (* dont_touch = "true" *) wire [1:0]  decode_exu_out_src;
+  (* dont_touch = "true" *) wire [11:0] decode_csr_addr;
+  (* dont_touch = "true" *) wire        decode_csr_read_enable;
+  (* dont_touch = "true" *) wire        decode_csr_write_enable;
+  (* dont_touch = "true" *) wire [2:0]  decode_csru_action;
+  (* dont_touch = "true" *) wire [31:0] decode_uimm32;
   ////        regfile
-  wire [31:0] regfile_rs1_data;
-  wire [31:0] regfile_rs2_data;
-  wire [31:0] regfile_jalr_data;
+  (* dont_touch = "true" *) wire [31:0] regfile_rs1_data;
+  (* dont_touch = "true" *) wire [31:0] regfile_rs2_data;
+  (* dont_touch = "true" *) wire [31:0] regfile_jalr_data;
   ////        exu
-  wire [31:0] exu_exu_out;
-  wire [31:0] exu_csr_out;
+  (* dont_touch = "true" *) wire [31:0] exu_exu_out;
+  (* dont_touch = "true" *) wire [31:0] exu_csr_out;
   ////        bru
-  wire        bru_go_branch;
-  wire [31:0] bru_go_branch_op1;
-  wire [31:0] bru_go_branch_op2;
+  (* dont_touch = "true" *) wire        bru_go_branch;
+  (* dont_touch = "true" *) wire [31:0] bru_go_branch_op1;
+  (* dont_touch = "true" *) wire [31:0] bru_go_branch_op2;
   ////        pipeline2
-  wire [31:0] pipe2_alu_out;
-  wire        pipe2_load_enable;
-  wire        pipe2_store_enable;
-  wire [2:0]  pipe2_load_type;
-  wire [1:0]  pipe2_store_type;
-  wire [31:0] pipe2_store_data;
-  wire        pipe2_dst_enable;
-  wire [4:0]  pipe2_dst_addr;
+  (* dont_touch = "true" *) wire [31:0] pipe2_alu_out;
+  (* dont_touch = "true" *) wire        pipe2_load_enable;
+  (* dont_touch = "true" *) wire        pipe2_store_enable;
+  (* dont_touch = "true" *) wire [2:0]  pipe2_load_type;
+  (* dont_touch = "true" *) wire [1:0]  pipe2_store_type;
+  (* dont_touch = "true" *) wire [31:0] pipe2_store_data;
+  (* dont_touch = "true" *) wire        pipe2_dst_enable;
+  (* dont_touch = "true" *) wire [4:0]  pipe2_dst_addr;
   ////        lsu
-  wire [31:0] lsu_load_data;
+  (* dont_touch = "true" *) wire [31:0] lsu_load_data;
   ////        wbu
-  wire [31:0] wbu_wb_data;
+  (* dont_touch = "true" *) wire [31:0] wbu_wb_data;
   ////        computed wires
 
 
@@ -344,7 +344,7 @@ module core (
     .load_type       (pipe2_load_type),
     .store_enable    (pipe2_store_enable),
     .store_type      (pipe2_store_type),
-    .addr            (pipe2_dst_addr),
+    .addr            (pipe2_alu_out),
     .store_data      (pipe2_store_data),
     //output
     .load_data       (lsu_load_data),

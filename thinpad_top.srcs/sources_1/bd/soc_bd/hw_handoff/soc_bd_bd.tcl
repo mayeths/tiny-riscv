@@ -177,11 +177,18 @@ proc create_root_design { parentCell } {
   set uart_rxd [ create_bd_port -dir I uart_rxd ]
   set uart_txd [ create_bd_port -dir O uart_txd ]
 
+  # Create instance: axi_bram_ctrl_0, and set properties
+  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.1 axi_bram_ctrl_0 ]
+  set_property -dict [ list \
+   CONFIG.READ_LATENCY {1} \
+   CONFIG.SINGLE_PORT_BRAM {1} \
+ ] $axi_bram_ctrl_0
+
   # Create instance: axi_crossbar_0, and set properties
   set axi_crossbar_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_crossbar:2.1 axi_crossbar_0 ]
   set_property -dict [ list \
    CONFIG.ID_WIDTH {16} \
-   CONFIG.NUM_MI {3} \
+   CONFIG.NUM_MI {1} \
    CONFIG.NUM_SI {2} \
    CONFIG.S00_ARB_PRIORITY {2} \
    CONFIG.S01_ARB_PRIORITY {1} \
@@ -202,36 +209,22 @@ proc create_root_design { parentCell } {
    CONFIG.S15_BASE_ID {0x00078000} \
  ] $axi_crossbar_0
 
-  # Create instance: axi_emc_0, and set properties
-  set axi_emc_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_emc:3.0 axi_emc_0 ]
+  # Create instance: blk_mem_gen_0, and set properties
+  set blk_mem_gen_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 blk_mem_gen_0 ]
   set_property -dict [ list \
-   CONFIG.C_INCLUDE_DATAWIDTH_MATCHING_0 {0} \
-   CONFIG.C_INCLUDE_DATAWIDTH_MATCHING_1 {0} \
-   CONFIG.C_MAX_MEM_WIDTH {32} \
-   CONFIG.C_MEM0_TYPE {1} \
-   CONFIG.C_MEM0_WIDTH {32} \
-   CONFIG.C_MEM1_TYPE {1} \
-   CONFIG.C_MEM1_WIDTH {32} \
-   CONFIG.C_NUM_BANKS_MEM {1} \
-   CONFIG.C_S_AXI_MEM_ID_WIDTH {16} \
- ] $axi_emc_0
-
-  # Create instance: axi_emc_1, and set properties
-  set axi_emc_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_emc:3.0 axi_emc_1 ]
-  set_property -dict [ list \
-   CONFIG.C_INCLUDE_DATAWIDTH_MATCHING_0 {0} \
-   CONFIG.C_INCLUDE_DATAWIDTH_MATCHING_1 {0} \
-   CONFIG.C_MAX_MEM_WIDTH {32} \
-   CONFIG.C_MEM0_TYPE {1} \
-   CONFIG.C_MEM0_WIDTH {32} \
-   CONFIG.C_MEM1_TYPE {1} \
-   CONFIG.C_MEM1_WIDTH {32} \
-   CONFIG.C_NUM_BANKS_MEM {1} \
-   CONFIG.C_S_AXI_MEM_ID_WIDTH {16} \
- ] $axi_emc_1
-
-  # Create instance: axi_uart16550_0, and set properties
-  set axi_uart16550_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 axi_uart16550_0 ]
+   CONFIG.Byte_Size {8} \
+   CONFIG.Coe_File {../../../../../../../../../../../tmp/main.coe} \
+   CONFIG.EN_SAFETY_CKT {true} \
+   CONFIG.Enable_32bit_Address {true} \
+   CONFIG.Fill_Remaining_Memory_Locations {true} \
+   CONFIG.Load_Init_File {true} \
+   CONFIG.Memory_Type {Single_Port_RAM} \
+   CONFIG.Port_A_Write_Rate {50} \
+   CONFIG.Register_PortA_Output_of_Memory_Primitives {true} \
+   CONFIG.Use_Byte_Write_Enable {true} \
+   CONFIG.Use_RSTA_Pin {true} \
+   CONFIG.use_bram_block {Stand_Alone} \
+ ] $blk_mem_gen_0
 
   # Create instance: core_0, and set properties
   set block_name core
@@ -244,12 +237,6 @@ proc create_root_design { parentCell } {
      return 1
    }
   
-  # Create instance: smartconnect_0, and set properties
-  set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
-  set_property -dict [ list \
-   CONFIG.NUM_SI {1} \
- ] $smartconnect_0
-
   # Create instance: util_vector_logic_0, and set properties
   set util_vector_logic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 util_vector_logic_0 ]
   set_property -dict [ list \
@@ -259,29 +246,19 @@ proc create_root_design { parentCell } {
  ] $util_vector_logic_0
 
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_crossbar_0_M00_AXI [get_bd_intf_pins axi_crossbar_0/M00_AXI] [get_bd_intf_pins axi_emc_0/S_AXI_MEM]
-  connect_bd_intf_net -intf_net axi_crossbar_0_M01_AXI [get_bd_intf_pins axi_crossbar_0/M01_AXI] [get_bd_intf_pins axi_emc_1/S_AXI_MEM]
-  connect_bd_intf_net -intf_net axi_crossbar_0_M02_AXI [get_bd_intf_pins axi_crossbar_0/M02_AXI] [get_bd_intf_pins smartconnect_0/S00_AXI]
-  connect_bd_intf_net -intf_net axi_emc_0_EMC_INTF [get_bd_intf_ports base_ram_if] [get_bd_intf_pins axi_emc_0/EMC_INTF]
-  connect_bd_intf_net -intf_net axi_emc_1_EMC_INTF [get_bd_intf_ports ext_ram_if] [get_bd_intf_pins axi_emc_1/EMC_INTF]
+  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTA [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTA] [get_bd_intf_pins blk_mem_gen_0/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_crossbar_0_M00_AXI [get_bd_intf_pins axi_bram_ctrl_0/S_AXI] [get_bd_intf_pins axi_crossbar_0/M00_AXI]
   connect_bd_intf_net -intf_net core_0_dbus [get_bd_intf_pins axi_crossbar_0/S00_AXI] [get_bd_intf_pins core_0/dbus]
   connect_bd_intf_net -intf_net core_0_ibus [get_bd_intf_pins axi_crossbar_0/S01_AXI] [get_bd_intf_pins core_0/ibus]
-  connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins axi_uart16550_0/S_AXI] [get_bd_intf_pins smartconnect_0/M00_AXI]
 
   # Create port connections
-  connect_bd_net -net axi_uart16550_0_sout [get_bd_ports uart_txd] [get_bd_pins axi_uart16550_0/sout]
-  connect_bd_net -net sin_0_1 [get_bd_ports uart_rxd] [get_bd_pins axi_uart16550_0/sin]
-  connect_bd_net -net system_clk_0_1 [get_bd_ports system_clk] [get_bd_pins axi_crossbar_0/aclk] [get_bd_pins axi_emc_0/rdclk] [get_bd_pins axi_emc_0/s_axi_aclk] [get_bd_pins axi_emc_1/rdclk] [get_bd_pins axi_emc_1/s_axi_aclk] [get_bd_pins axi_uart16550_0/s_axi_aclk] [get_bd_pins core_0/system_clk] [get_bd_pins smartconnect_0/aclk]
+  connect_bd_net -net system_clk_0_1 [get_bd_ports system_clk] [get_bd_pins axi_bram_ctrl_0/s_axi_aclk] [get_bd_pins axi_crossbar_0/aclk] [get_bd_pins core_0/system_clk]
   connect_bd_net -net system_rst_0_1 [get_bd_ports system_rst] [get_bd_pins core_0/system_rst] [get_bd_pins util_vector_logic_0/Op1]
-  connect_bd_net -net util_vector_logic_0_Res [get_bd_pins axi_crossbar_0/aresetn] [get_bd_pins axi_emc_0/s_axi_aresetn] [get_bd_pins axi_emc_1/s_axi_aresetn] [get_bd_pins axi_uart16550_0/s_axi_aresetn] [get_bd_pins smartconnect_0/aresetn] [get_bd_pins util_vector_logic_0/Res]
+  connect_bd_net -net util_vector_logic_0_Res [get_bd_pins axi_bram_ctrl_0/s_axi_aresetn] [get_bd_pins axi_crossbar_0/aresetn] [get_bd_pins util_vector_logic_0/Res]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00400000 -offset 0x80000000 [get_bd_addr_spaces core_0/dbus] [get_bd_addr_segs axi_emc_0/S_AXI_MEM/Mem0] SEG_axi_emc_0_Mem0
-  create_bd_addr_seg -range 0x00400000 -offset 0x80000000 [get_bd_addr_spaces core_0/ibus] [get_bd_addr_segs axi_emc_0/S_AXI_MEM/Mem0] SEG_axi_emc_0_Mem0
-  create_bd_addr_seg -range 0x00400000 -offset 0x80400000 [get_bd_addr_spaces core_0/dbus] [get_bd_addr_segs axi_emc_1/S_AXI_MEM/Mem0] SEG_axi_emc_1_Mem0
-  create_bd_addr_seg -range 0x00400000 -offset 0x80400000 [get_bd_addr_spaces core_0/ibus] [get_bd_addr_segs axi_emc_1/S_AXI_MEM/Mem0] SEG_axi_emc_1_Mem0
-  create_bd_addr_seg -range 0x00010000 -offset 0x10000000 [get_bd_addr_spaces core_0/dbus] [get_bd_addr_segs axi_uart16550_0/S_AXI/Reg] SEG_axi_uart16550_0_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x10000000 [get_bd_addr_spaces core_0/ibus] [get_bd_addr_segs axi_uart16550_0/S_AXI/Reg] SEG_axi_uart16550_0_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x80000000 [get_bd_addr_spaces core_0/dbus] [get_bd_addr_segs axi_bram_ctrl_0/S_AXI/Mem0] SEG_axi_bram_ctrl_0_Mem0
+  create_bd_addr_seg -range 0x00010000 -offset 0x80000000 [get_bd_addr_spaces core_0/ibus] [get_bd_addr_segs axi_bram_ctrl_0/S_AXI/Mem0] SEG_axi_bram_ctrl_0_Mem0
 
 
   # Restore current instance

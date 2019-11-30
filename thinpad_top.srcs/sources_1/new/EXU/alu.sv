@@ -19,30 +19,30 @@ module ALU(
 );
 
   //bus
-  logic [31:0] add_out  = in1 + in2;
-  logic [31:0] sub_out  = in1 - in2;
-  logic [31:0] and_out  = in1 & in2;
-  logic [31:0] or_out   = in1 | in2;
-  logic [31:0] xor_out  = in1 ^ in2;
+  (* dont_touch = "true" *) logic [31:0] add_out  = in1 + in2;
+  (* dont_touch = "true" *) logic [31:0] sub_out  = in1 - in2;
+  (* dont_touch = "true" *) logic [31:0] and_out  = in1 & in2;
+  (* dont_touch = "true" *) logic [31:0] or_out   = in1 | in2;
+  (* dont_touch = "true" *) logic [31:0] xor_out  = in1 ^ in2;
   // TODO: the sll, srl, sra, slt, sltu may go wrong in this way, check them carefully.
   // For slt_out, check https://stackoverflow.com/a/53419495/11702338
   //   to see why we cann't just use sub_out[31]. (overflow)
-  logic [31:0] sll_out  = (in1 << in2[4:0]);
-  logic [31:0] srl_out  = (in1 >> in2[4:0]);
-  logic [31:0] sra_out  = ({{32{in1[31]}}, in1} >> in2[4:0]);
-  logic [31:0] slt_out  = {31'b0, in1[31] != in2[31] ? in1[31] : sub_out[31]};
-  logic [31:0] sltu_out = {31'b0, sub_out[31]};
+  (* dont_touch = "true" *) logic [31:0] sll_out  = (in1 << in2[4:0]);
+  (* dont_touch = "true" *) logic [31:0] srl_out  = (in1 >> in2[4:0]);
+  (* dont_touch = "true" *) logic [31:0] sra_out  = ({{32{in1[31]}}, in1} >> in2[4:0]);
+  (* dont_touch = "true" *) logic [31:0] slt_out  = {31'b0, in1[31] != in2[31] ? in1[31] : sub_out[31]};
+  (* dont_touch = "true" *) logic [31:0] sltu_out = {31'b0, sub_out[31]};
   //signal
-  logic need_add  = action == `ALU_ADD;
-  logic need_sub  = action == `ALU_SUB;
-  logic need_and  = action == `ALU_AND;
-  logic need_or   = action == `ALU_OR;
-  logic need_xor  = action == `ALU_XOR;
-  logic need_sll  = action == `ALU_SLL;
-  logic need_srl  = action == `ALU_SRL;
-  logic need_sra  = action == `ALU_SRA;
-  logic need_slt  = action == `ALU_SLT;
-  logic need_sltu = action == `ALU_SLTU;
+  (* dont_touch = "true" *) logic need_add  = action == `ALU_ADD;
+  (* dont_touch = "true" *) logic need_sub  = action == `ALU_SUB;
+  (* dont_touch = "true" *) logic need_and  = action == `ALU_AND;
+  (* dont_touch = "true" *) logic need_or   = action == `ALU_OR;
+  (* dont_touch = "true" *) logic need_xor  = action == `ALU_XOR;
+  (* dont_touch = "true" *) logic need_sll  = action == `ALU_SLL;
+  (* dont_touch = "true" *) logic need_srl  = action == `ALU_SRL;
+  (* dont_touch = "true" *) logic need_sra  = action == `ALU_SRA;
+  (* dont_touch = "true" *) logic need_slt  = action == `ALU_SLT;
+  (* dont_touch = "true" *) logic need_sltu = action == `ALU_SLTU;
 
   ////////
   assign out = 32'b0

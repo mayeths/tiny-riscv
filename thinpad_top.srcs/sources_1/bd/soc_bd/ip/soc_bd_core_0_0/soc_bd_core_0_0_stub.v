@@ -1,7 +1,7 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2018.3 (lin64) Build 2405991 Thu Dec  6 23:36:41 MST 2018
-// Date        : Sat Nov 30 01:43:26 2019
+// Date        : Sat Nov 30 17:11:59 2019
 // Host        : Gyc-Arch-Linux running 64-bit Arch Linux
 // Command     : write_verilog -force -mode synth_stub
 //               /home/gaoyichuan/workspace/cod/cod19grp73/thinpad_top.srcs/sources_1/bd/soc_bd/ip/soc_bd_core_0_0/soc_bd_core_0_0_stub.v

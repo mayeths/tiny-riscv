@@ -101,10 +101,9 @@ module axi_if
 
 
   enum logic [2:0] { IDLE, READ_WAIT, WRITE_DATA, WRITE_ADDR, WRITE_WAIT } CS, NS;
-
-  logic [31:0]  rdata;
-  logic         valid;
-  logic         granted;
+  (* dont_touch = "true" *) logic [31:0]  rdata;
+  (* dont_touch = "true" *) logic         valid;
+  (* dont_touch = "true" *) logic         granted;
 
   // main FSM
   always_comb
@@ -234,7 +233,7 @@ module axi_if
   generate if (AXI4_RDATA_WIDTH == 32) begin
       assign rdata = r_data_i[31:0];
     end else if (AXI4_RDATA_WIDTH == 64) begin
-      logic [0:0] addr_q;
+  (* dont_touch = "true" *) logic [0:0] addr_q;
 
       always_ff @(posedge clk_i, negedge rst_ni)
       begin
@@ -303,8 +302,8 @@ module axi_if
 
   generate if (REGISTERED_GRANT == "TRUE")
     begin
-      logic        valid_q;
-      logic [31:0] rdata_q;
+  (* dont_touch = "true" *) logic        valid_q;
+  (* dont_touch = "true" *) logic [31:0] rdata_q;
 
       always_ff @(posedge clk_i, negedge rst_ni)
       begin

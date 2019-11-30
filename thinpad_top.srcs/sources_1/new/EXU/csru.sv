@@ -22,14 +22,14 @@ module CSRU(
 
   //control signals.
   //TODO: what are the ecall & ebreak do?
-  wire is_ecall  = csru_action == `CSRU_ECALL;
-  wire is_ebreak = csru_action == `CSRU_EBREAK;
-  wire is_csrrw  = csru_action == `CSRU_CSRRW;   // CSR read & write
-  wire is_csrrs  = csru_action == `CSRU_CSRRS;   // CSR read & set
-  wire is_csrrc  = csru_action == `CSRU_CSRRC;   // CSR read & clean
-  wire is_csrrwi = csru_action == `CSRU_CSRRWI;  // CSR read & writei
-  wire is_csrrsi = csru_action == `CSRU_CSRRSI;  // CSR read & seti
-  wire is_csrrci = csru_action == `CSRU_CSRRCI;  // CSR read & cleani
+  (* dont_touch = "true" *) wire is_ecall  = csru_action == `CSRU_ECALL;
+  (* dont_touch = "true" *) wire is_ebreak = csru_action == `CSRU_EBREAK;
+  (* dont_touch = "true" *) wire is_csrrw  = csru_action == `CSRU_CSRRW;   // CSR read & write
+  (* dont_touch = "true" *) wire is_csrrs  = csru_action == `CSRU_CSRRS;   // CSR read & set
+  (* dont_touch = "true" *) wire is_csrrc  = csru_action == `CSRU_CSRRC;   // CSR read & clean
+  (* dont_touch = "true" *) wire is_csrrwi = csru_action == `CSRU_CSRRWI;  // CSR read & writei
+  (* dont_touch = "true" *) wire is_csrrsi = csru_action == `CSRU_CSRRSI;  // CSR read & seti
+  (* dont_touch = "true" *) wire is_csrrci = csru_action == `CSRU_CSRRCI;  // CSR read & cleani
 
   assign rd_out  = csr;
   assign csr_out = 32'b0
