@@ -14,7 +14,7 @@ module exu(
   input  logic [2:0]  csru_action,
   input  logic [31:0] csr,
   input  logic [31:0] uimm32,
-  input  logic [2:0]  exu_out_src,
+  input  logic [1:0]  exu_out_src,
 
   output logic [31:0] exu_out,
   output logic [31:0] csr_out
