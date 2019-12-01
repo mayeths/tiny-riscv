@@ -23,41 +23,67 @@ module ifu(
   input  wire [31:0] go_branch_op2
 );
 
-  // IFU遇到jal或jalr指令，直接在内部完成跳转
-  // IFU遇到branch或mret等指令，不作为，后面的部件通知go_trap, from_trap或者go_branch再跳转
-
-  ////// Control signals
   (* dont_touch = "true" *) wire is_jal  = inst[6:0] == `OP_JAL;
   (* dont_touch = "true" *) wire [31:0] immJal  = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0};
-  ////// Bus
-  // PC privilege: trap > branch > jal | jalr
+
+
+  //平时不工作，但stall期间会自动收集跳转信号们的 pending collect unit。
+  pcu u_pcu(
+  	.clk           (clk           ),
+    .stall         (stall         ),
+    // 记录branch
+    .go_branch     (go_branch     ),
+    .go_branch_op1 (go_branch_op1 ),
+    .go_branch_op2 (go_branch_op2 ),
+    // 记录jalr
+    .go_jalr       (go_jalr       ),
+    .go_jalr_op1   (go_jalr_op1   ),
+    .go_jalr_op2   (go_jalr_op2   ),
+    // 记录jal
+    .is_jal        (is_jal        ),
+    .pc            (pc            ),
+    .immJal        (immJal        ),
+    // output
+    .pending_valid (pending_valid ),
+    .pending_op1   (pending_op1   ),
+    .pending_op2   (pending_op2   )
+  );
+
+  // PC privilege: pending > branch|jalr > jal
+  // 当stall的时候，给biu什么pc_next都没用，反正PC和INST空打转
   (* dont_touch = "true" *) wire [31:0] pc_next_op1 =
-    go_branch ? go_branch_op1 :  // pc of EX phase
-    stall     ? pc :
-    go_jalr   ? go_jalr_op1 :    // pc of EX phase
-    is_jal    ? pc :             // pc of IF phase
-    pc;                          // Normal
+    rst           ? 32'h8000_0000 :
+    pending_valid ? pending_op1 :
+    go_branch     ? go_branch_op1 :  // pc of EX phase
+    go_jalr       ? go_jalr_op1 :    // pc of EX phase
+    is_jal        ? pc :             // pc of IF phase
+    pc;                              // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next_op2 =
-    go_branch ? go_branch_op2 :  // B-type imm32
-    stall     ? 32'b0 : 
-    go_jalr   ? go_jalr_op2 :    // pc of EX phase
-    is_jal    ? immJal :         // J-type imm32
-    rst       ? 32'h0 :          // reset
-    32'h4;                       // Normal
+    rst           ? 32'h0 :
+    pending_valid ? pending_op2 :
+    go_branch     ? go_branch_op2 :  // B-type imm32
+    go_jalr       ? go_jalr_op2 :    // 32'b0
+    is_jal        ? immJal :         // J-type imm32
+    32'h4;                           // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next = pc_next_op1 + pc_next_op2;
 
-  assign jalr_addr = inst[19:15];
-
-  assign ibus_ce = 1'b1;
-  assign ibus_addr = rst ? 32'h8000_0000 : pc_next;
+  assign ibus_addr = pc_next;
+  assign ibus_ce   = 1'b1;
 
   always @(posedge clk) begin
-    //PC从特殊到一般
-    pc <=
-      rst   ? 32'h8000_0000 :
-      pc_next;
-    
-    inst <= stall ? (is_jal ? inst : `INST_NOP) : ibus_rdata;
+    //从特殊到一般
+    if (rst) begin
+      inst <= `INST_NOP;
+      pc   <= 32'h8000_0000;
+    end else if (stall) begin
+      // stall时，pc_next的请求被忽略了。因而此时的inst是无效的inst
+      inst <= `INST_NOP;
+      pc   <= pc;
+    end else begin
+      // 如果不是stall，但pending_valid，则需等待一个周期让bus重新处理pc_next的请求
+      inst <= pending_valid ? `INST_NOP : ibus_rdata;
+      pc   <= pending_valid ? pc        : pc_next;
+    end
   end
 
 endmodule
