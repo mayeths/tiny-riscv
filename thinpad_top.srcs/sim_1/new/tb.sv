@@ -67,9 +67,38 @@ initial begin
     // #10000;
     // cpld.pc_send_byte(8'h33);
     reset_btn = 0;
+    TxD_start = 0;
+    TxD_data = 8'h00;
     #1 reset_btn = 1;
-    #1 reset_btn = 0;
+    #200 reset_btn = 0;
+
+    #3500000
+    TxD_data = 8'h57;   // 'W'
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
 end
+
+
+reg TxD_start;
+reg [7:0] TxD_data;
+
+wire tb_TxD;
+wire TxD_busy;
+
+async_transmitter 
+#(
+    .ClkFrequency (50000000 ),
+    .Baud         (115200   )
+)
+tb_async_transmitter(
+	.clk       (clk_50M   ),
+    .TxD_start (TxD_start ),
+    .TxD_data  (TxD_data  ),
+    .TxD       (tb_TxD    ),
+    .TxD_busy  (TxD_busy  )
+);
+
 
 // 待测试用户设计
 thinpad_top dut(
@@ -83,7 +112,7 @@ thinpad_top dut(
     .dpy1(dpy1),
     .dpy0(dpy0),
     .txd(txd),
-    .rxd(rxd),
+    .rxd(tb_TxD),
     .uart_rdn(uart_rdn),
     .uart_wrn(uart_wrn),
     .uart_dataready(uart_dataready),

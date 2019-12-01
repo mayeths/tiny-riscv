@@ -28,7 +28,7 @@ module lsu(
 
   input wire        uart_rx_data_ready,
   input wire [7:0]  uart_rx_data,
-  output wire       uart_rx_clear
+  output reg       uart_rx_clear
 );
 
   // Load data source
@@ -114,12 +114,26 @@ module lsu(
   
   // async rxd
   wire uart_rx_enable = uart_enable & load_enable;
-  wire [31:0] uart_status_reg = {26'b0, ~uart_tx_busy, 3'b0, uart_rx_data_ready, 1'b0};
+  wire [31:0] uart_status_reg = {26'b0, ~uart_tx_busy, 4'b0, uart_rx_data_ready};
   wire [31:0] uart_load_data = 
     addr == 32'h1000_0000 ? uart_rx_data :  // read uart rx data
     addr == 32'h1000_0005 ? uart_status_reg : // read status
     32'b0;
+ 
+  // clear uart_rx_data_ready after one read to data register
+  reg data_ready_latch;
+  always @(posedge clk) begin
+    if(uart_rx_data_ready & uart_rx_enable & addr == 32'h1000_0000) begin
+      data_ready_latch <= 1'b1;
+    end else begin
+      data_ready_latch <= 1'b0;
+    end
 
-  assign uart_rx_clear = 1'b0;
+    if(data_ready_latch) begin
+      uart_rx_clear <= 1'b1;
+    end else begin
+      uart_rx_clear <= 1'b0;
+    end
+  end
 
 endmodule
