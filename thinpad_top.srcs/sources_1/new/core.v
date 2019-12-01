@@ -2,125 +2,29 @@ module core (
   input wire system_clk,
   input wire system_rst,
 
-  // IBUS AXI ports
-  //AXI write address bus -------------- // USED// -----------
-  output wire [AXI4_ID_WIDTH-1:0]      ibus_awid,
-  output wire [AXI4_ADDRESS_WIDTH-1:0] ibus_awaddr,
-  output wire [ 7:0]                   ibus_awlen,
-  output wire [ 2:0]                   ibus_awsize,
-  output wire [ 1:0]                   ibus_awburst,
-  output wire                          ibus_awlock,
-  output wire [ 3:0]                   ibus_awcache,
-  output wire [ 2:0]                   ibus_awprot,
-  output wire [ 3:0]                   ibus_awregion,
-  output wire [AXI4_USER_WIDTH-1:0]    ibus_awuser,
-  output wire [ 3:0]                   ibus_awqos,
-  output wire                          ibus_awvalid,
-  input  wire                          ibus_awready,
-  // ---------------------------------------------------------
+  // BaseRAM (instruction ram)
+  inout wire  [31:0] base_ram_data,
+  output wire [19:0] base_ram_addr,
+  output wire [3:0]  base_ram_be_n,
+  output wire        base_ram_ce_n,
+  output wire        base_ram_oe_n,
+  output wire        base_ram_we_n,
 
-  //AXI write data bus -------------- // USED// --------------
-  output wire [AXI4_WDATA_WIDTH-1:0]   ibus_wdata,
-  output wire [AXI4_WDATA_WIDTH/8-1:0] ibus_wstrb,
-  output wire                          ibus_wlast,
-  output wire [AXI4_USER_WIDTH-1:0]    ibus_wuser,
-  output wire                          ibus_wvalid,
-  input  wire                          ibus_wready,
-  // ---------------------------------------------------------
+  // ExtRAM (data ram)
+  inout wire  [31:0] ext_ram_data,
+  output wire [19:0] ext_ram_addr,
+  output wire [3:0]  ext_ram_be_n,
+  output wire        ext_ram_ce_n,
+  output wire        ext_ram_oe_n,
+  output wire        ext_ram_we_n,
 
-  //AXI write response bus -------------- // USED// ----------
-  input  wire   [AXI4_ID_WIDTH-1:0]    ibus_bid,
-  input  wire   [ 1:0]                 ibus_bresp,
-  input  wire                          ibus_bvalid,
-  input  wire   [AXI4_USER_WIDTH-1:0]  ibus_buser,
-  output wire                          ibus_bready,
-  // ---------------------------------------------------------
-
-  //AXI read address bus -------------------------------------
-  output wire [AXI4_ID_WIDTH-1:0]      ibus_arid,
-  output wire [AXI4_ADDRESS_WIDTH-1:0] ibus_araddr,
-  output wire [ 7:0]                   ibus_arlen,
-  output wire [ 2:0]                   ibus_arsize,
-  output wire [ 1:0]                   ibus_arburst,
-  output wire                          ibus_arlock,
-  output wire [ 3:0]                   ibus_arcache,
-  output wire [ 2:0]                   ibus_arprot,
-  output wire [ 3:0]                   ibus_arregion,
-  output wire [AXI4_USER_WIDTH-1:0]    ibus_aruser,
-  output wire [ 3:0]                   ibus_arqos,
-  output wire                          ibus_arvalid,
-  input  wire                          ibus_arready,
-  // ---------------------------------------------------------
-
-  //AXI read data bus ----------------------------------------
-  input  wire [AXI4_ID_WIDTH-1:0]     ibus_rid,
-  input  wire [AXI4_RDATA_WIDTH-1:0]  ibus_rdata,
-  input  wire [ 1:0]                  ibus_rresp,
-  input  wire                         ibus_rlast,
-  input  wire [AXI4_USER_WIDTH-1:0]   ibus_ruser,
-  input  wire                         ibus_rvalid,
-  output wire                         ibus_rready,
-  // ---------------------------------------------------------
-
-  // DBUS AXI ports
-  //AXI write address bus -------------- // USED// -----------
-  output wire [AXI4_ID_WIDTH-1:0]      dbus_awid,
-  output wire [AXI4_ADDRESS_WIDTH-1:0] dbus_awaddr,
-  output wire [ 7:0]                   dbus_awlen,
-  output wire [ 2:0]                   dbus_awsize,
-  output wire [ 1:0]                   dbus_awburst,
-  output wire                          dbus_awlock,
-  output wire [ 3:0]                   dbus_awcache,
-  output wire [ 2:0]                   dbus_awprot,
-  output wire [ 3:0]                   dbus_awregion,
-  output wire [AXI4_USER_WIDTH-1:0]    dbus_awuser,
-  output wire [ 3:0]                   dbus_awqos,
-  output wire                          dbus_awvalid,
-  input  wire                          dbus_awready,
-  // ---------------------------------------------------------
-
-  //AXI write data bus -------------- // USED// --------------
-  output wire [AXI4_WDATA_WIDTH-1:0]   dbus_wdata,
-  output wire [AXI4_WDATA_WIDTH/8-1:0] dbus_wstrb,
-  output wire                          dbus_wlast,
-  output wire [AXI4_USER_WIDTH-1:0]    dbus_wuser,
-  output wire                          dbus_wvalid,
-  input  wire                          dbus_wready,
-  // ---------------------------------------------------------
-
-  //AXI write response bus -------------- // USED// ----------
-  input  wire [AXI4_ID_WIDTH-1:0]      dbus_bid,
-  input  wire [ 1:0]                   dbus_bresp,
-  input  wire                          dbus_bvalid,
-  input  wire [AXI4_USER_WIDTH-1:0]    dbus_buser,
-  output wire                          dbus_bready,
-  // ---------------------------------------------------------
-
-  //AXI read address bus -------------------------------------
-  output wire [AXI4_ID_WIDTH-1:0]      dbus_arid,
-  output wire [AXI4_ADDRESS_WIDTH-1:0] dbus_araddr,
-  output wire [ 7:0]                   dbus_arlen,
-  output wire [ 2:0]                   dbus_arsize,
-  output wire [ 1:0]                   dbus_arburst,
-  output wire                          dbus_arlock,
-  output wire [ 3:0]                   dbus_arcache,
-  output wire [ 2:0]                   dbus_arprot,
-  output wire [ 3:0]                   dbus_arregion,
-  output wire [AXI4_USER_WIDTH-1:0]    dbus_aruser,
-  output wire [ 3:0]                   dbus_arqos,
-  output wire                          dbus_arvalid,
-  input  wire                          dbus_arready,
-  // ---------------------------------------------------------
-
-  //AXI read data bus ----------------------------------------
-  input  wire [AXI4_ID_WIDTH-1:0]     dbus_rid,
-  input  wire [AXI4_RDATA_WIDTH-1:0]  dbus_rdata,
-  input  wire [ 1:0]                  dbus_rresp,
-  input  wire                         dbus_rlast,
-  input  wire [AXI4_USER_WIDTH-1:0]   dbus_ruser,
-  input  wire                         dbus_rvalid,
-  output wire                         dbus_rready
-  // ---------------------------------------------------------
+  // async uart controller
+  output wire       uart_tx_start,
+  output wire [7:0] uart_tx_data,
+  input wire        uart_tx_busy,
+  input wire        uart_rx_data_ready,
+  input wire  [7:0] uart_rx_data,
+  output wire       uart_rx_clear
 );
 
   parameter AXI4_ADDRESS_WIDTH = 32;
@@ -207,6 +111,11 @@ module core (
   (* dont_touch = "true" *) wire [31:0] wbu_wb_data;
   ////        computed wires
 
+  // base ram readonly
+  assign base_ram_be_n = 4'b0;
+  assign base_ram_ce_n = 1'b0;
+  assign base_ram_we_n = 1'b1;
+  assign base_ram_oe_n = 1'b0;
 
   ifu ifu_(
     //input
@@ -216,11 +125,10 @@ module core (
     //output
     .pc             (ifu_pc),
     .inst           (ifu_inst),
-    //assign to axi_if
-    // .data_req       (ibus_data_req),
-    // .data_addr      (ibus_data_addr),
-    // .data_rvalid    (ibus_data_rvalid),
-    // .data_rdata     (ibus_data_rdata),
+    //assign to iram
+    .iram_addr      (base_ram_addr),
+    .iram_data      (base_ram_data),
+    //jalr
     .go_jalr       (decode_is_jalr),
     .go_jalr_op1   (regfile_rs1_data),
     .go_jalr_op2   (32'b0),
@@ -350,15 +258,20 @@ module core (
     .store_data      (pipe2_store_data),
     //output
     .load_data       (lsu_load_data),
-    //assign to axi_if
-    .data_req        (dbus_data_req),
-    .data_gnt        (dbus_data_gnt),
-    .data_we         (dbus_data_we),
-    .data_be         (dbus_data_be),
-    .data_addr       (dbus_data_addr),
-    .data_rvalid     (dbus_data_rvalid),
-    .data_rdata      (dbus_data_rdata),
-    .data_wdata      (dbus_data_wdata)
+    //assign to ext ram
+    .dram_cen        (ext_ram_ce_n),
+    .dram_addr       (ext_ram_addr),
+    .dram_wen        (ext_ram_we_n),
+    .dram_ben        (ext_ram_be_n),
+    .dram_oen        (ext_ram_oe_n),
+    .dram_data       (ext_ram_data),
+    //assign to uart
+    .uart_tx_start      (uart_tx_start),
+    .uart_tx_data       (uart_tx_data),
+    .uart_tx_busy       (uart_tx_busy),
+    .uart_rx_data_ready (uart_rx_data_ready),
+    .uart_rx_data       (uart_rx_data),
+    .uart_rx_clear      (uart_rx_clear)
   );
 
   wbu wbu_(
@@ -368,122 +281,6 @@ module core (
     .alu_out    (pipe2_alu_out),
     //output
     .wb_data(wbu_wb_data)
-  );
-
-  axi_if ibus_axi_if(
-    .clk_i         (system_clk      ),
-    .rst_ni        (~system_rst     ),
-    .data_req_i    (ibus_data_req   ),
-    .data_gnt_o    (                ),
-    .data_rvalid_o (ibus_data_rvalid),
-    .data_addr_i   (ibus_data_addr  ),
-    .data_we_i     (1'b0            ),
-    .data_be_i     (4'b1111         ),
-    .data_rdata_o  (ibus_data_rdata ),
-    .data_wdata_i  (32'b0           ),
-
-    .aw_id_o       (ibus_awid       ),
-    .aw_addr_o     (ibus_awaddr     ),
-    .aw_len_o      (ibus_awlen      ),
-    .aw_size_o     (ibus_awsize     ),
-    .aw_burst_o    (ibus_awburst    ),
-    .aw_lock_o     (ibus_awlock     ),
-    .aw_cache_o    (ibus_awcache    ),
-    .aw_prot_o     (ibus_awprot     ),
-    .aw_region_o   (ibus_awregion   ),
-    .aw_user_o     (ibus_awuser     ),
-    .aw_qos_o      (ibus_awqos      ),
-    .aw_valid_o    (ibus_awvalid    ),
-    .aw_ready_i    (ibus_awready    ),
-    .w_data_o      (ibus_wdata      ),
-    .w_strb_o      (ibus_wstrb      ),
-    .w_last_o      (ibus_wlast      ),
-    .w_user_o      (ibus_wuser      ),
-    .w_valid_o     (ibus_wvalid     ),
-    .w_ready_i     (ibus_wready     ),
-    .b_id_i        (ibus_bid        ),
-    .b_resp_i      (ibus_bresp      ),
-    .b_valid_i     (ibus_bvalid     ),
-    .b_user_i      (ibus_buser      ),
-    .b_ready_o     (ibus_bready     ),
-    .ar_id_o       (ibus_arid       ),
-    .ar_addr_o     (ibus_araddr     ),
-    .ar_len_o      (ibus_arlen      ),
-    .ar_size_o     (ibus_arsize     ),
-    .ar_burst_o    (ibus_arburst    ),
-    .ar_lock_o     (ibus_arlock     ),
-    .ar_cache_o    (ibus_arcache    ),
-    .ar_prot_o     (ibus_arprot     ),
-    .ar_region_o   (ibus_arregion   ),
-    .ar_user_o     (ibus_aruser     ),
-    .ar_qos_o      (ibus_arqos      ),
-    .ar_valid_o    (ibus_arvalid    ),
-    .ar_ready_i    (ibus_arready    ),
-    .r_id_i        (ibus_rid        ),
-    .r_data_i      (ibus_rdata      ),
-    .r_resp_i      (ibus_rresp      ),
-    .r_last_i      (ibus_rlast      ),
-    .r_user_i      (ibus_ruser      ),
-    .r_valid_i     (ibus_rvalid     ),
-    .r_ready_o     (ibus_rready     )
-  );
-
-  axi_if dbus_axi_if(
-    .clk_i         (system_clk      ),
-    .rst_ni        (~system_rst     ),
-    .data_req_i    (dbus_data_req   ),
-    .data_gnt_o    (dbus_data_gnt   ),
-    .data_rvalid_o (dbus_data_rvalid),
-    .data_addr_i   (dbus_data_addr  ),
-    .data_we_i     (dbus_data_we    ),
-    .data_be_i     (dbus_data_be    ),
-    .data_rdata_o  (dbus_data_rdata ),
-    .data_wdata_i  (dbus_data_wdata ),
-
-    .aw_id_o       (dbus_awid       ),
-    .aw_addr_o     (dbus_awaddr     ),
-    .aw_len_o      (dbus_awlen      ),
-    .aw_size_o     (dbus_awsize     ),
-    .aw_burst_o    (dbus_awburst    ),
-    .aw_lock_o     (dbus_awlock     ),
-    .aw_cache_o    (dbus_awcache    ),
-    .aw_prot_o     (dbus_awprot     ),
-    .aw_region_o   (dbus_awregion   ),
-    .aw_user_o     (dbus_awuser     ),
-    .aw_qos_o      (dbus_awqos      ),
-    .aw_valid_o    (dbus_awvalid    ),
-    .aw_ready_i    (dbus_awready    ),
-    .w_data_o      (dbus_wdata      ),
-    .w_strb_o      (dbus_wstrb      ),
-    .w_last_o      (dbus_wlast      ),
-    .w_user_o      (dbus_wuser      ),
-    .w_valid_o     (dbus_wvalid     ),
-    .w_ready_i     (dbus_wready     ),
-    .b_id_i        (dbus_bid        ),
-    .b_resp_i      (dbus_bresp      ),
-    .b_valid_i     (dbus_bvalid     ),
-    .b_user_i      (dbus_buser      ),
-    .b_ready_o     (dbus_bready     ),
-    .ar_id_o       (dbus_arid       ),
-    .ar_addr_o     (dbus_araddr     ),
-    .ar_len_o      (dbus_arlen      ),
-    .ar_size_o     (dbus_arsize     ),
-    .ar_burst_o    (dbus_arburst    ),
-    .ar_lock_o     (dbus_arlock     ),
-    .ar_cache_o    (dbus_arcache    ),
-    .ar_prot_o     (dbus_arprot     ),
-    .ar_region_o   (dbus_arregion   ),
-    .ar_user_o     (dbus_aruser     ),
-    .ar_qos_o      (dbus_arqos      ),
-    .ar_valid_o    (dbus_arvalid    ),
-    .ar_ready_i    (dbus_arready    ),
-    .r_id_i        (dbus_rid        ),
-    .r_data_i      (dbus_rdata      ),
-    .r_resp_i      (dbus_rresp      ),
-    .r_last_i      (dbus_rlast      ),
-    .r_user_i      (dbus_ruser      ),
-    .r_valid_i     (dbus_rvalid     ),
-    .r_ready_o     (dbus_rready     )
   );
 
 endmodule

@@ -68,7 +68,7 @@ initial begin
     // cpld.pc_send_byte(8'h33);
     reset_btn = 0;
     #1 reset_btn = 1;
-    #10 reset_btn = 0;
+    #1 reset_btn = 0;
 end
 
 // 待测试用户设计

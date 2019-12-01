@@ -80,6 +80,9 @@ module thinpad_top(
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
 
+parameter SYSCLK_FREQ = 10000000;
+parameter ASYNC_UART_BAUD = 115200;
+
 wire locked, system_clk;
 pll_example clock_gen (
     // Clock out ports
@@ -97,64 +100,68 @@ always@(posedge system_clk or negedge locked) begin
     else        system_rst <= 1'b0;
 end
 
-// core core_1(
-// 	.system_clk    (system_clk    ),
-//     .system_rst    (system_rst    ),
-//     .base_ram_data (base_ram_data ),
-//     .base_ram_addr (base_ram_addr ),
-//     .base_ram_be_n (base_ram_be_n ),
-//     .base_ram_ce_n (base_ram_ce_n ),
-//     .base_ram_oe_n (base_ram_oe_n ),
-//     .base_ram_we_n (base_ram_we_n ),
-//     .ext_ram_data  (ext_ram_data  ),
-//     .ext_ram_addr  (ext_ram_addr  ),
-//     .ext_ram_be_n  (ext_ram_be_n  ),
-//     .ext_ram_ce_n  (ext_ram_ce_n  ),
-//     .ext_ram_oe_n  (ext_ram_oe_n  ),
-//     .ext_ram_we_n  (ext_ram_we_n  )
-// );
+assign uart_wrn = 1'b1;
+assign uart_rdn = 1'b1;
 
-soc_bd_wrapper u_soc_bd_wrapper(
-    .system_clk          (system_clk),
-    .system_rst          (system_rst)
+wire       uart_tx_start;
+wire [7:0] uart_tx_data;
+wire       uart_tx_busy;
+wire       uart_rx_data_ready;
+wire [7:0] uart_rx_data;
+wire       uart_rx_clear;
 
-    // BaseRAM
-	// .base_ram_if_addr    (base_ram_addr),
-    // .base_ram_if_adv_ldn (),
-    // .base_ram_if_ben     (base_ram_be_n),
-    // .base_ram_if_ce      (),
-    // .base_ram_if_ce_n    (base_ram_ce_n),
-    // .base_ram_if_clken   (),
-    // .base_ram_if_cre     (),
-    // .base_ram_if_dq_io   (base_ram_data),
-    // .base_ram_if_lbon    (),
-    // .base_ram_if_oen     (base_ram_oe_n),
-    // .base_ram_if_qwen    (),
-    // .base_ram_if_rnw     (),
-    // .base_ram_if_rpn     (),
-    // .base_ram_if_wait    (),
-    // .base_ram_if_wen     (base_ram_we_n),
+core core_1(
+	.system_clk    (system_clk    ),
+    .system_rst    (system_rst    ),
 
-    // ExtRAM
-    // .ext_ram_if_addr     (ext_ram_addr),
-    // .ext_ram_if_adv_ldn  (),
-    // .ext_ram_if_ben      (ext_ram_be_n),
-    // .ext_ram_if_ce       (),
-    // .ext_ram_if_ce_n     (ext_ram_ce_n),
-    // .ext_ram_if_clken    (),
-    // .ext_ram_if_cre      (),
-    // .ext_ram_if_dq_io    (ext_ram_data),
-    // .ext_ram_if_lbon     (),
-    // .ext_ram_if_oen      (ext_ram_oe_n),
-    // .ext_ram_if_qwen     (),
-    // .ext_ram_if_rnw      (),
-    // .ext_ram_if_rpn      (),
-    // .ext_ram_if_wait     (),
-    // .ext_ram_if_wen      (ext_ram_we_n),
+    .base_ram_data (base_ram_data ),
+    .base_ram_addr (base_ram_addr ),
+    .base_ram_be_n (base_ram_be_n ),
+    .base_ram_ce_n (base_ram_ce_n ),
+    .base_ram_oe_n (base_ram_oe_n ),
+    .base_ram_we_n (base_ram_we_n ),
 
-    // Direct UART
-    // .uart_rxd            (rxd),
-    // .uart_txd            (txd)
+    .ext_ram_data  (ext_ram_data  ),
+    .ext_ram_addr  (ext_ram_addr  ),
+    .ext_ram_be_n  (ext_ram_be_n  ),
+    .ext_ram_ce_n  (ext_ram_ce_n  ),
+    .ext_ram_oe_n  (ext_ram_oe_n  ),
+    .ext_ram_we_n  (ext_ram_we_n  ),
+
+    .uart_tx_start      (uart_tx_start      ),
+    .uart_tx_data       (uart_tx_data       ),
+    .uart_tx_busy       (uart_tx_busy       ),
+    .uart_rx_data_ready (uart_rx_data_ready ),
+    .uart_rx_data       (uart_rx_data       ),
+    .uart_rx_clear      (uart_rx_clear      )
+);
+
+async_transmitter 
+#(
+    .ClkFrequency (SYSCLK_FREQ     ),
+    .Baud         (ASYNC_UART_BAUD )
+)
+u_async_transmitter(
+	.clk       (system_clk    ),
+    .TxD_start (uart_tx_start ),
+    .TxD_data  (uart_tx_data  ),
+    .TxD       (txd           ),
+    .TxD_busy  (uart_tx_busy  )
+);
+
+async_receiver 
+#(
+    .ClkFrequency (SYSCLK_FREQ     ),
+    .Baud         (ASYNC_UART_BAUD )
+)
+u_async_receiver(
+	.clk             (system_clk         ),
+    .RxD             (rxd                ),
+    .RxD_data_ready  (uart_rx_data_ready ),
+    .RxD_clear       (uart_rx_clear      ),
+    .RxD_data        (uart_rx_data       ),
+    .RxD_idle        (),
+    .RxD_endofpacket ()
 );
 
 endmodule
