@@ -54,6 +54,9 @@ module core (
   (* dont_touch = "true" *) wire [31:0] ifu_pc;
   (* dont_touch = "true" *) wire [31:0] ifu_inst;
   (* dont_touch = "true" *) wire [4:0]  ifu_jalr_addr;
+  (* dont_touch = "true" *) wire        ifu_ibus_ce;
+  (* dont_touch = "true" *) wire [31:0] ifu_ibus_addr;
+  (* dont_touch = "true" *) wire [31:0] ifu_ibus_rdata;
   ////        pipeline1
   (* dont_touch = "true" *) wire [31:0] pipe1_pc;
   (* dont_touch = "true" *) wire [31:0] pipe1_inst;
@@ -107,9 +110,17 @@ module core (
   (* dont_touch = "true" *) wire [4:0]  pipe2_dst_addr;
   ////        lsu
   (* dont_touch = "true" *) wire [31:0] lsu_load_data;
+  (* dont_touch = "true" *) wire        lsu_dbus_ce;
+  (* dont_touch = "true" *) wire [31:0] lsu_dbus_addr;
+  (* dont_touch = "true" *) wire        lsu_dbus_we;
+  (* dont_touch = "true" *) wire [3:0]  lsu_dbus_be;
+  (* dont_touch = "true" *) wire        lsu_dbus_oe;
+  (* dont_touch = "true" *) wire [31:0] lsu_dbus_rdata;
+  (* dont_touch = "true" *) wire [31:0] lsu_dbus_wdata;
   ////        wbu
   (* dont_touch = "true" *) wire [31:0] wbu_wb_data;
-  ////        computed wires
+  ////        biu
+  wire ibus_stallreq;
 
   // base ram readonly
   assign base_ram_be_n = 4'b0;
@@ -121,13 +132,14 @@ module core (
     //input
     .clk            (system_clk),
     .rst            (system_rst),
-    .stall          (),
+    .stall          (ibus_stallreq),
     //output
     .pc             (ifu_pc),
     .inst           (ifu_inst),
-    //assign to iram
-    .iram_addr      (base_ram_addr),
-    .iram_data      (base_ram_data),
+    //assign to biu
+    .ibus_ce        (ifu_ibus_ce),
+    .ibus_addr      (ifu_ibus_addr),
+    .ibus_rdata     (ifu_ibus_rdata),
     //jalr
     .go_jalr       (decode_is_jalr),
     .go_jalr_op1   (regfile_rs1_data),
@@ -258,13 +270,14 @@ module core (
     .store_data      (pipe2_store_data),
     //output
     .load_data       (lsu_load_data),
-    //assign to ext ram
-    .dram_cen        (ext_ram_ce_n),
-    .dram_addr       (ext_ram_addr),
-    .dram_wen        (ext_ram_we_n),
-    .dram_ben        (ext_ram_be_n),
-    .dram_oen        (ext_ram_oe_n),
-    .dram_data       (ext_ram_data),
+    //assign to biu
+    .dbus_ce         (lsu_dbus_ce),
+    .dbus_addr       (lsu_dbus_addr),
+    .dbus_we         (lsu_dbus_we),
+    .dbus_be         (lsu_dbus_be),
+    .dbus_oe         (lsu_dbus_oe),
+    .dbus_rdata      (lsu_dbus_rdata),
+    .dbus_wdata      (lsu_dbus_wdata),
     //assign to uart
     .uart_tx_start      (uart_tx_start),
     .uart_tx_data       (uart_tx_data),
@@ -281,6 +294,33 @@ module core (
     .alu_out    (pipe2_alu_out),
     //output
     .wb_data(wbu_wb_data)
+  );
+
+  biu biu_(
+  	.dbus_ce       (lsu_dbus_ce   ),
+    .dbus_addr     (lsu_dbus_addr ),
+    .dbus_we       (lsu_dbus_we   ),
+    .dbus_be       (lsu_dbus_be   ),
+    .dbus_oe       (lsu_dbus_oe   ),
+    .dbus_rdata    (lsu_dbus_rdata),
+    .dbus_wdata    (lsu_dbus_wdata),
+    .ibus_ce       (ifu_ibus_ce   ),
+    .ibus_addr     (ifu_ibus_addr ),
+    .ibus_rdata    (ifu_ibus_rdata),
+    .ibus_stallreq (ibus_stallreq ),
+
+    .base_ram_data (base_ram_data ),
+    .base_ram_addr (base_ram_addr ),
+    .base_ram_be_n (base_ram_be_n ),
+    .base_ram_ce_n (base_ram_ce_n ),
+    .base_ram_oe_n (base_ram_oe_n ),
+    .base_ram_we_n (base_ram_we_n ),
+    .ext_ram_data  (ext_ram_data  ),
+    .ext_ram_addr  (ext_ram_addr  ),
+    .ext_ram_be_n  (ext_ram_be_n  ),
+    .ext_ram_ce_n  (ext_ram_ce_n  ),
+    .ext_ram_oe_n  (ext_ram_oe_n  ),
+    .ext_ram_we_n  (ext_ram_we_n  )
   );
 
 endmodule

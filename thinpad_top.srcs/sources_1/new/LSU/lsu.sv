@@ -14,12 +14,21 @@ module lsu(
   output wire [31:0] load_data,
 
   //Assign to data ram
-  output wire        dram_cen,
-  output wire [31:0] dram_addr,
-  output wire        dram_wen,
-  output wire [3:0]  dram_ben,
-  output wire        dram_oen,
-  inout  wire [31:0] dram_data,
+  // output wire        dram_cen,
+  // output wire [31:0] dram_addr,
+  // output wire        dram_wen,
+  // output wire [3:0]  dram_ben,
+  // output wire        dram_oen,
+  // inout  wire [31:0] dram_data,
+
+  //Assign to biu
+  output wire        dbus_ce,
+  output wire [31:0] dbus_addr,
+  output wire        dbus_we,
+  output wire [3:0]  dbus_be,
+  output wire        dbus_oe,
+  input wire  [31:0] dbus_rdata,
+  output wire [31:0] dbus_wdata,
 
   //Assign to async uart controller
   output wire       uart_tx_start,
@@ -28,11 +37,11 @@ module lsu(
 
   input wire        uart_rx_data_ready,
   input wire [7:0]  uart_rx_data,
-  output reg       uart_rx_clear
+  output reg        uart_rx_clear
 );
 
   // Load data source
-  (* dont_touch = "true" *) wire [31:0] load_data_in = load_enable ? dram_data : 32'b0;
+  (* dont_touch = "true" *) wire [31:0] load_data_in = load_enable ? dbus_rdata : 32'b0;
 
   // Load Byte
   (* dont_touch = "true" *) wire load_byte_a = addr[1:0] == 2'b00;
@@ -86,15 +95,13 @@ module lsu(
     store_word | store_byte_a | store_half_ab
   };
 
-  wire dram_enable = (load_enable | store_enable) &
-    (addr >= 32'h8040_0000) & (addr <= 32'h807F_FFFF);
-  
-  assign dram_cen  = ~dram_enable;
-  assign dram_addr = addr >> 2;   // mem address is in words
-  assign dram_oen  = ~load_enable;
-  assign dram_wen  = ~store_enable;
-  assign dram_ben  = ~store_abcd;
-  assign dram_data = store_enable ? store_data : 32'bz;
+  //TODO: move this and uart to biu
+  assign dbus_ce    = (load_enable | store_enable) & ~uart_enable;
+  assign dbus_addr  = addr;
+  assign dbus_oe    = dbus_ce & load_enable;
+  assign dbus_we    = dbus_ce & store_enable;
+  assign dbus_be    = dbus_we ? store_abcd : 4'b1111;
+  assign dbus_wdata = store_enable ? store_data : 32'b0;
 
   assign load_data =
     uart_rx_enable ? uart_load_data : 

@@ -87,7 +87,7 @@ module decode (
   (* dont_touch = "true" *) wire is_lui   = opcode == `OP_LUI;
   (* dont_touch = "true" *) wire is_auipc = opcode == `OP_AUIPC;
   (* dont_touch = "true" *) wire is_jal   = opcode == `OP_JAL;
-  (* dont_touch = "true" *) assign is_jalr  = opcode == `OP_JALR;
+  assign is_jalr  = opcode == `OP_JALR;
   //branch
   assign is_beq  = belong_branch & funct3_000;
   assign is_bne  = belong_branch & funct3_001;

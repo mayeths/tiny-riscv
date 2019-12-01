@@ -8,9 +8,10 @@ module ifu(
   output reg  [31:0] pc,
   output reg  [31:0] inst,
 
-  //Assign to inst ram
-  output wire [19:0] iram_addr,
-  input  wire [31:0] iram_data,
+  //Assign to biu
+  output wire ibus_ce,
+  output wire [31:0] ibus_addr,
+  input  wire [31:0] ibus_rdata,
 
   input wire go_jalr,
   input wire [31:0] go_jalr_op1,
@@ -32,11 +33,13 @@ module ifu(
   // PC privilege: trap > branch > jal | jalr
   (* dont_touch = "true" *) wire [31:0] pc_next_op1 =
     go_branch ? go_branch_op1 :  // pc of EX phase
+    stall     ? pc :
     go_jalr   ? go_jalr_op1 :    // pc of EX phase
     is_jal    ? pc :             // pc of IF phase
     pc;                          // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next_op2 =
     go_branch ? go_branch_op2 :  // B-type imm32
+    stall     ? 32'b0 : 
     go_jalr   ? go_jalr_op2 :    // pc of EX phase
     is_jal    ? immJal :         // J-type imm32
     rst       ? 32'h0 :          // reset
@@ -44,7 +47,9 @@ module ifu(
   (* dont_touch = "true" *) wire [31:0] pc_next = pc_next_op1 + pc_next_op2;
 
   assign jalr_addr = inst[19:15];
-  assign iram_addr = (rst ? 32'h8000_0000 : pc_next) >> 2;
+
+  assign ibus_ce = 1'b1;
+  assign ibus_addr = rst ? 32'h8000_0000 : pc_next;
 
   always @(posedge clk) begin
     //PC从特殊到一般
@@ -52,7 +57,7 @@ module ifu(
       rst   ? 32'h8000_0000 :
       pc_next;
     
-    inst <= iram_data;
+    inst <= stall ? (is_jal ? inst : `INST_NOP) : ibus_rdata;
   end
 
 endmodule
