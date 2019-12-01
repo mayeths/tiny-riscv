@@ -1,7 +1,7 @@
 // IFU (Intruction Fetch Unit): 取指单元
 `include "../defines.sv"
 
-module ifu(
+module ifu #(parameter ORIGIN_ADDR = 32'h8000_0000)(
   input  wire clk,
   input  wire rst,
   input  wire stall,
@@ -50,16 +50,13 @@ module ifu(
   );
 
   // PC privilege: pending > branch|jalr > jal
-  // 当stall的时候，给biu什么pc_next都没用，反正PC和INST空打转
   (* dont_touch = "true" *) wire [31:0] pc_next_op1 =
-    rst           ? 32'h8000_0000 :
     pending_valid ? pending_op1 :
     go_branch     ? go_branch_op1 :  // pc of EX phase
     go_jalr       ? go_jalr_op1 :    // pc of EX phase
     is_jal        ? pc :             // pc of IF phase
     pc;                              // Normal
   (* dont_touch = "true" *) wire [31:0] pc_next_op2 =
-    rst           ? 32'h0 :
     pending_valid ? pending_op2 :
     go_branch     ? go_branch_op2 :  // B-type imm32
     go_jalr       ? go_jalr_op2 :    // 32'b0
@@ -74,7 +71,7 @@ module ifu(
     //从特殊到一般
     if (rst) begin
       inst <= `INST_NOP;
-      pc   <= 32'h8000_0000;
+      pc   <= ORIGIN_ADDR - 4;
     end else if (stall) begin
       // stall时，pc_next的请求被忽略了。因而此时的inst是无效的inst
       inst <= `INST_NOP;
