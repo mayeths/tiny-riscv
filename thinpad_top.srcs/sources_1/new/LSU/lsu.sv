@@ -73,7 +73,7 @@ module lsu(
     {16{load_half_cd}} & load_data_in[31:16]
   };
   // Load Word
-  (* dont_touch = "true" *) wire load_word_out = load_data_in;
+  (* dont_touch = "true" *) wire [31:0] load_word_out = load_data_in;
 
   // Store Byte
   (* dont_touch = "true" *) wire store_byte_a = store_type == `SB & addr[1:0] == 2'b00;

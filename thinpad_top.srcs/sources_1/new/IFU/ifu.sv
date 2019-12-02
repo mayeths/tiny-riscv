@@ -27,6 +27,10 @@ module ifu #(parameter ORIGIN_ADDR = 32'h8000_0000)(
   (* dont_touch = "true" *) wire [31:0] immJal  = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0};
 
 
+  (* dont_touch = "true" *) wire pending_valid;
+  (* dont_touch = "true" *) wire [31:0] pending_op1;
+  (* dont_touch = "true" *) wire [31:0] pending_op2;
+
   //平时不工作，但stall期间会自动收集跳转信号们的 pending collect unit。
   pcu u_pcu(
   	.clk           (clk           ),
@@ -78,8 +82,8 @@ module ifu #(parameter ORIGIN_ADDR = 32'h8000_0000)(
       pc   <= pc;
     end else begin
       // 如果不是stall，但pending_valid，则需等待一个周期让bus重新处理pc_next的请求
-      inst <= pending_valid ? `INST_NOP : ibus_rdata;
-      pc   <= pending_valid ? pc        : pc_next;
+      inst <= ibus_rdata;
+      pc   <= pc_next;
     end
   end
 

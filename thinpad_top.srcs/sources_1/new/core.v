@@ -122,12 +122,6 @@ module core (
   ////        biu
   wire ibus_stallreq;
 
-  // base ram readonly
-  assign base_ram_be_n = 4'b0;
-  assign base_ram_ce_n = 1'b0;
-  assign base_ram_we_n = 1'b1;
-  assign base_ram_oe_n = 1'b0;
-
   ifu ifu_(
     //input
     .clk            (system_clk),
@@ -257,7 +251,7 @@ module core (
     .exu_dst_enable  (decode_dst_enable),      .lsu_dst_enable  (pipe2_dst_enable),
     .exu_dst_addr    (decode_dst_addr),        .lsu_dst_addr    (pipe2_dst_addr)
   );
-
+// 4091410ns
   lsu lsu_(
     //input
     .clk             (system_clk),

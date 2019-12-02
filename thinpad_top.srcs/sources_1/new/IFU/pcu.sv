@@ -34,14 +34,14 @@ module pcu(
 
   assign pending_valid = pending_branch | pending_jalr | pending_jal;
   assign pending_op1 =
-    pending_branch ? go_branch_op1 :
-    pending_jalr   ? go_jalr_op1 :
-    pending_jal    ? pc :
+    pending_branch ? pending_branch_op1 :
+    pending_jalr   ? pending_jalr_op1 :
+    pending_jal    ? pending_jal_op1 :
     32'b0;
   assign pending_op2 =
-    pending_branch ? go_branch_op2 :
-    pending_jalr   ? go_jalr_op2 :
-    pending_jal    ? pc :
+    pending_branch ? pending_branch_op2 :
+    pending_jalr   ? pending_jalr_op2 :
+    pending_jal    ? pending_jal_op2 :
     32'b0;
 
   always @(posedge clk) begin

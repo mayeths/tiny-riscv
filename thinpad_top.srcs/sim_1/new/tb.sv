@@ -77,6 +77,31 @@ initial begin
     TxD_start = 1;
 
     #200 TxD_start = 0;
+
+    #100000 TxD_data = 8'h47;   // 'G'
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
+
+    #100000 TxD_data = 8'h00;   
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
+
+    #100000 TxD_data = 8'h00;
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
+
+    #100000 TxD_data = 8'h10;
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
+
+    #100000 TxD_data = 8'h80;
+    TxD_start = 1;
+
+    #200 TxD_start = 0;
 end
 
 
