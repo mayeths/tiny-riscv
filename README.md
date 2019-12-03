@@ -1,12 +1,3 @@
-Thinpad 模板工程
----------------
-
-工程包含示例代码和所有引脚约束，可以直接编译。
-
-代码中包含中文注释，编码为utf-8，在Windows版Vivado下可能出现乱码问题。  
-请用别的代码编辑器打开文件，并将编码改为GBK。
-
----
 
 ### Instruction sets do we need to run linux
 See [issue](https://github.com/riscv/riscv-linux/issues/150)
@@ -15,38 +6,19 @@ See [issue](https://github.com/riscv/riscv-linux/issues/150)
 
 ### Milestone
 
-- RV32I: 最简单的CPU
-  - 实现没有分支的CPU：整数运算指令和整数存储指令
-  - 实现分支和跳转：基本工作流
-  - 实现CSR和FENCE指令
-  - 实现异常和中断：特殊指令
-- 实现总线接口(找个时间做)
-- RV32M: 补充乘除法
-- RV32A: 存储器原子指令
-- 剩余的其他工作
+- [ ] RV32I: 最简单的CPU
+  - [x] 实现没有分支的CPU：整数运算指令和整数存储指令
+  - [x] 实现分支和跳转：基本工作流
+  - [x] 实现总线接口（只做了很简单的逻辑控制，根本没有总线）
+  - [ ] 实现CSR和FENCE指令
+  - [ ] 实现异常和中断：特殊指令
+- [ ] RV32M: 补充乘除法
+- [ ] RV32A: 存储器原子指令(在单CPU下直接NOP就可以)
 
-### RISC-V instruction sets
+### See also
+- [riscv-meta](https://github.com/csail-csg/riscv-meta): 有关 riscv 的很多有用东西，包括指令出现频率和寄存器出现频率
+- [riscv-tools](https://github.com/riscv/riscv-tools): 当然是官方的 tools 了
+- [riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain): 生成riscv指令集的gcc，使用 `--with-arch` 参数可以生成支持不同指令子集的汇编指令，例如不想要 c 拓展就不要带 c
+- [riscv-tests](https://github.com/riscv/riscv-tests): 官方提供的指令测试集，`isa/rv64ui` 下是普通算术指令。使用 riscv-unknown-elf-gcc 编译一下就可以使用了。相关指令：`riscv32-unknown-elf-objcopy -j .text -j '.text.*' -O binary -v xx.elf xx.bin`
 
-- RV32I
-  - 整数运算指令
-    - ADDI, SLTI, SLTIU, ANDI, ORI, XORI, SLLI, SRLI, SRAI, LUI, AUIPC
-  - 整数存储指令
-    - LW, LH, LHU, LB, LBU, SW, SH, SB
-  - 分支跳转指令
-    - JAL, JALR, BEQ, BNE, BLT, BLTU, BGE, BGEU
-  - CSR 寄存器操作指令
-    - CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI
-  - 寄存器屏障指令（FENCE）
-    - FENCE, FENCE.I
-  - 特殊指令
-    - ECALL, EBREAK, MRET, WFI
-- RV32M
-  - 整数乘法指令
-    - MUL, MULH, MULHU, MULHSU
-  - 整数除法指令
-    - DIV, DIVU, REM, REMU
-- RV32A
-  - 原子存储指令(AMO) 指令
-    - amoswap.w, amoadd.w, amoand.w, amoor.w, amoxor.w, amomax.w, amomaxu.w, amomin.w, amominu.w
-  - 互斥读和互斥写指令
-    - lr.w, sc.w
+*找时间继续做吧。毕竟看了那么多的特权架构，下个学期还可以选操作系统在自己的CPU上跑系统*
