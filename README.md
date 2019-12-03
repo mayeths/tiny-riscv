@@ -4,7 +4,9 @@ This is my homework for class **"Computer Organization"「计算机组成原理�
 ## 🤔 How can I run this code?
 Unfortunately, `master` and `dev` branches are incomplete. We marked branch `dual-mem` as our final work to submit homework. The board we use is `xc7a100tfgg676-2L`, platform is `vivado 2018.3`.
 
-If you are interested, you may checkout to branch `dual-mem`, put the `main.bin` and `eram.bin` to `BASE_RAM_INIT_FILE` and `EXT_RAM_INIT_FILE` parameter in `thinpad_top.srcs\sim_1\new\tb.sv`, then start behaviour simulation. In the first 3500ns, `tb.sv` will put char to Tcl console, then release `system_rst` signal if correctly. CPU will reads instruction from base_ram and ext_ram after init, but I can't promise it may work well. Be relax to contact me if you need troubleshooting.
+If you are interested, you may checkout to branch `dual-mem`, put the `main.bin` and `eram.bin` to `BASE_RAM_INIT_FILE` and `EXT_RAM_INIT_FILE` parameter in `thinpad_top.srcs/sim_1/new/tb.sv`, then start behaviour simulation. In the first 3500ns, `tb.sv` will put char to Tcl console, then release `system_rst` signal if correctly. CPU will reads instruction from base_ram and ext_ram after init, but I can't promise it may work well. Be relax to contact me if you need troubleshooting.
+
+The main code is under `thinpad_top.srcs/sources_1/new`. This is the default folder of vivado, so we use it.
 
 ## 😎 Milestone
 
@@ -13,12 +15,13 @@ If you are interested, you may checkout to branch `dual-mem`, put the `main.bin`
   - [x] Support load/store instruction -- e.g., `lw`, `lb`, `sw`, `sb`
   - [x] Support jump & branch instruction -- e.g., `jal`, `jalr`, `beq`
   - [x] Bus Interface Unit(BIU) -- Control memory and uart
-  - [ ] Support CSR -- See priviledged spec for detail
+  - [ ] Exception & Interrupt -- See priviledged spec for detail (here we need CSR)
+  - [ ] Page Table -- See section 4.3 in priviledged spec for detail (here we need S-mode)
 - [ ] RV32M: Multiplication & Division -- e.g., `mul`, `div`
 - [ ] RV32A: AMO instruction -- e.g., `amoadd`. We can treat them as `nop + (add)` with one hart CPU.
 
 ## 👀 Instruction sets do we need to run linux
-See this [issue](https://github.com/riscv/riscv-linux/issues/150).
+See this [issue](https://github.com/riscv/riscv-linux/issues/150) for deep discuss.
 - Linux kernel: only requires I and A (check makefiles)
 - Linux distributions: RV64GC as described in [here](https://github.com/riscv/riscv-platform-specs/blob/master/riscv-unix.md).
 
@@ -31,5 +34,9 @@ Note that linux support risc-v which only implement m-mode and nommu after [comm
 - [riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain) 生成riscv指令集的gcc，使用 `--with-arch` 参数可以生成支持不同指令子集的汇编指令，例如不想要 c 拓展就不要带 c
 - [riscv-tests](https://github.com/riscv/riscv-tests) 官方提供的指令测试集，`isa/rv64ui` 下是普通算术指令。使用 riscv-unknown-elf-gcc 编译一下就可以使用了。相关指令：`riscv32-unknown-elf-objcopy -j .text -j '.text.*' -O binary -v xx.elf xx.bin`
 - [riscv-meta](https://github.com/csail-csg/riscv-meta) 别人整理的有关 riscv 的很多东西，包括指令出现频率和寄存器出现频率。看addi指令这么多，估计是li伪指令用的最多
+
+<br />
+
+---
 
 *找时间继续做吧。毕竟看了那么多的特权架构，下个学期还可以选操作系统在自己的CPU上跑系统*
