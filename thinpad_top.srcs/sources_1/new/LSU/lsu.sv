@@ -41,54 +41,54 @@ module lsu(
 );
 
   // Load data source
-  (* dont_touch = "true" *) wire [31:0] load_data_in = load_enable ? dbus_rdata : 32'b0;
+  wire [31:0] load_data_in = load_enable ? dbus_rdata : 32'b0;
 
   // Load Byte
-  (* dont_touch = "true" *) wire load_byte_a = addr[1:0] == 2'b00;
-  (* dont_touch = "true" *) wire load_byte_b = addr[1:0] == 2'b01;
-  (* dont_touch = "true" *) wire load_byte_c = addr[1:0] == 2'b10;
-  (* dont_touch = "true" *) wire load_byte_d = addr[1:0] == 2'b11;
-  (* dont_touch = "true" *) wire lb_extend =
+  wire load_byte_a = addr[1:0] == 2'b00;
+  wire load_byte_b = addr[1:0] == 2'b01;
+  wire load_byte_c = addr[1:0] == 2'b10;
+  wire load_byte_d = addr[1:0] == 2'b11;
+  wire lb_extend =
     load_byte_a & load_data_in[7]  |
     load_byte_b & load_data_in[15] |
     load_byte_c & load_data_in[23] |
     load_byte_d & load_data_in[31] ;
-  (* dont_touch = "true" *) wire [31:0] load_byte_out = {load_type == `LB ? {24{lb_extend}} : 24'b0,
+  wire [31:0] load_byte_out = {load_type == `LB ? {24{lb_extend}} : 24'b0,
     {8{load_byte_a}} & load_data_in[7:0]   |
     {8{load_byte_b}} & load_data_in[15:8]  |
     {8{load_byte_c}} & load_data_in[23:16] |
     {8{load_byte_d}} & load_data_in[31:24]
   };
   // Load Half
-  (* dont_touch = "true" *) wire load_half_ab = addr[1:0] == 2'b00;
-  (* dont_touch = "true" *) wire load_half_bc = addr[1:0] == 2'b01;
-  (* dont_touch = "true" *) wire load_half_cd = addr[1:0] == 2'b10;
-  (* dont_touch = "true" *) wire lh_extend =
+  wire load_half_ab = addr[1:0] == 2'b00;
+  wire load_half_bc = addr[1:0] == 2'b01;
+  wire load_half_cd = addr[1:0] == 2'b10;
+  wire lh_extend =
     load_half_ab & load_data_in[15] |
     load_half_bc & load_data_in[23] |
     load_half_cd & load_data_in[31] ;
-  (* dont_touch = "true" *) wire [31:0] load_half_out = {load_type == `LH ? {16{lh_extend}} : 16'b0,
+  wire [31:0] load_half_out = {load_type == `LH ? {16{lh_extend}} : 16'b0,
     {16{load_half_ab}} & load_data_in[15:0] |
     {16{load_half_bc}} & load_data_in[23:8] |
     {16{load_half_cd}} & load_data_in[31:16]
   };
   // Load Word
-  (* dont_touch = "true" *) wire [31:0] load_word_out = load_data_in;
+  wire [31:0] load_word_out = load_data_in;
 
   // Store Byte
-  (* dont_touch = "true" *) wire store_byte_a = store_type == `SB & addr[1:0] == 2'b00;
-  (* dont_touch = "true" *) wire store_byte_b = store_type == `SB & addr[1:0] == 2'b01;
-  (* dont_touch = "true" *) wire store_byte_c = store_type == `SB & addr[1:0] == 2'b10;
-  (* dont_touch = "true" *) wire store_byte_d = store_type == `SB & addr[1:0] == 2'b11;
+  wire store_byte_a = store_type == `SB & addr[1:0] == 2'b00;
+  wire store_byte_b = store_type == `SB & addr[1:0] == 2'b01;
+  wire store_byte_c = store_type == `SB & addr[1:0] == 2'b10;
+  wire store_byte_d = store_type == `SB & addr[1:0] == 2'b11;
 
   // Store Half
-  (* dont_touch = "true" *) wire store_half_ab = store_type == `SH & addr[1:0] == 2'b00;
-  (* dont_touch = "true" *) wire store_half_bc = store_type == `SH & addr[1:0] == 2'b01;
-  (* dont_touch = "true" *) wire store_half_cd = store_type == `SH & addr[1:0] == 2'b10;
+  wire store_half_ab = store_type == `SH & addr[1:0] == 2'b00;
+  wire store_half_bc = store_type == `SH & addr[1:0] == 2'b01;
+  wire store_half_cd = store_type == `SH & addr[1:0] == 2'b10;
 
   // Store Word
-  (* dont_touch = "true" *) wire store_word = store_type == `SW;
-  (* dont_touch = "true" *) wire [3:0] store_abcd = {
+  wire store_word = store_type == `SW;
+  wire [3:0] store_abcd = {
     store_word | store_byte_d | store_half_cd,
     store_word | store_byte_c | store_half_cd | store_half_bc,
     store_word | store_byte_b | store_half_bc | store_half_ab,

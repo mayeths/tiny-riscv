@@ -120,7 +120,28 @@ module core (
   ////        wbu
   (* dont_touch = "true" *) wire [31:0] wbu_wb_data;
   ////        biu
-  wire ibus_stallreq;
+  (* dont_touch = "true" *) wire ibus_stallreq;
+  ////        baseram_wrapper
+  (* dont_touch = "true" *) wire baseram_req_valid;
+  (* dont_touch = "true" *) wire baseram_req_read;
+  (* dont_touch = "true" *) wire baseram_req_write;
+  (* dont_touch = "true" *) wire baseram_addr;
+  (* dont_touch = "true" *) wire baseram_write_data;
+  (* dont_touch = "true" *) wire baseram_write_mask;
+  (* dont_touch = "true" *) wire baseram_busy;
+  (* dont_touch = "true" *) wire baseram_ok;
+  (* dont_touch = "true" *) wire baseram_read_data;
+  ////        extram_wrapper
+  (* dont_touch = "true" *) wire extram_req_valid;
+  (* dont_touch = "true" *) wire extram_req_read;
+  (* dont_touch = "true" *) wire extram_req_write;
+  (* dont_touch = "true" *) wire extram_addr;
+  (* dont_touch = "true" *) wire extram_write_data;
+  (* dont_touch = "true" *) wire extram_write_mask;
+  (* dont_touch = "true" *) wire extram_busy;
+  (* dont_touch = "true" *) wire extram_ok;
+  (* dont_touch = "true" *) wire extram_read_data;
+
 
   ifu ifu_(
     //input
@@ -303,19 +324,75 @@ module core (
     .ibus_rdata    (ifu_ibus_rdata),
     .ibus_stallreq (ibus_stallreq ),
 
-    .base_ram_data (base_ram_data ),
-    .base_ram_addr (base_ram_addr ),
-    .base_ram_be_n (base_ram_be_n ),
-    .base_ram_ce_n (base_ram_ce_n ),
-    .base_ram_oe_n (base_ram_oe_n ),
-    .base_ram_we_n (base_ram_we_n ),
-    .ext_ram_data  (ext_ram_data  ),
-    .ext_ram_addr  (ext_ram_addr  ),
-    .ext_ram_be_n  (ext_ram_be_n  ),
-    .ext_ram_ce_n  (ext_ram_ce_n  ),
-    .ext_ram_oe_n  (ext_ram_oe_n  ),
-    .ext_ram_we_n  (ext_ram_we_n  )
+    //to sramwrapper
+    .baseram_req_valid  (baseram_req_valid),
+    .baseram_req_read   (baseram_req_read),
+    .baseram_req_write  (baseram_req_write),
+    .baseram_addr       (baseram_addr),
+    .baseram_write_data (baseram_write_data),
+    .baseram_write_mask (baseram_write_mask),
+    .baseram_busy       (baseram_busy),
+    .baseram_ok         (baseram_ok),
+    .baseram_read_data  (baseram_read_data),
+    .extram_req_valid  (extram_req_valid),
+    .extram_req_read   (extram_req_read),
+    .extram_req_write  (extram_req_write),
+    .extram_addr       (extram_addr),
+    .extram_write_data (extram_write_data),
+    .extram_write_mask (extram_write_mask),
+    .extram_busy       (extram_busy),
+    .extram_ok         (extram_ok),
+    .extram_read_data  (extram_read_data)
   );
+
+  parameter SRAM_DELAY = 1;
+  //base ram wrapper
+  sram_wrapper #(.DELAY_COUNT (SRAM_DELAY))
+  baseram_wrapper(
+    .clk        (system_clk ),
+    //to biu
+    .req_valid  (baseram_req_valid  ),
+    .req_read   (baseram_req_read   ),
+    .req_write  (baseram_req_write  ),
+    .addr       (baseram_addr       ),
+    .write_data (baseram_write_data ),
+    .write_mask (baseram_write_mask ),
+    .busy       (baseram_busy       ),
+    .ok         (baseram_ok         ),
+    .read_data  (baseram_read_data  ),
+    //to external ram
+    .ram_data   (base_ram_data),
+    .ram_addr   (base_ram_addr),
+    .ram_be_n   (base_ram_be_n),
+    .ram_ce_n   (base_ram_ce_n),
+    .ram_oe_n   (base_ram_oe_n),
+    .ram_we_n   (base_ram_we_n)
+  );
+  //ext ram wrapper
+  sram_wrapper #(.DELAY_COUNT (SRAM_DELAY))
+  extram_wrapper(
+    .clk        (system_clk ),
+    //to biu
+    .req_valid  (extram_req_valid  ),
+    .req_read   (extram_req_read   ),
+    .req_write  (extram_req_write  ),
+    .addr       (extram_addr       ),
+    .write_data (extram_write_data ),
+    .write_mask (extram_write_mask ),
+    .busy       (extram_busy       ),
+    .ok         (extram_ok         ),
+    .read_data  (extram_read_data  ),
+    //to external ram
+    .ram_data   (ext_ram_data),
+    .ram_addr   (ext_ram_addr),
+    .ram_be_n   (ext_ram_be_n),
+    .ram_ce_n   (ext_ram_ce_n),
+    .ram_oe_n   (ext_ram_oe_n),
+    .ram_we_n   (ext_ram_we_n)
+  );
+
+
+
 
 endmodule
 
